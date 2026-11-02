@@ -1,0 +1,16 @@
+[package]
+name = "claude-switch-pro"
+version = "1.0.0"
+edition = "2021"
+description = "Native Rust Desktop Application & System Tray Controller for Claude Responses Bridge"
+authors = ["Youssef UI / Advanced Agentic Coding"]
+
+[[bin]]
+name = "claude-switch-pro"
+path = "src/main.rs"
+
+[[bin]]
+name = "ClaudeSwitchPro-Setup"
+path = "src/installer.rs"
+
+[dependencies]
