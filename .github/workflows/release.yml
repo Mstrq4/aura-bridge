@@ -72,17 +72,18 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
-          releaseName: "Claude Switch Pro ${{ github.ref_name }}"
+          releaseName: "AuraBridge ${{ github.ref_name }}"
           releaseBody: |
-            ### Claude Switch Pro ${{ github.ref_name }}
-            - Unified Tauri v2 + Embedded Rust Bridge Engine (Instant Native Launch, Zero Node.js)
-            - Aura Glassmorphic Multi-Step Windows Setup Wizard (`ClaudeSwitchPro-Setup-*.exe`) & macOS Apple Silicon / Intel / Universal `.dmg`
+            ### AuraBridge ${{ github.ref_name }}
+            - Unified Tauri v2 + Embedded Rust `/v1/responses` Bridge Engine (Instant `<100ms` Native Launch, Zero Node.js)
+            - AuraBridge 4-Step Visual Setup Wizard (`AuraBridge-Setup-*.exe`) & macOS Apple Silicon / Intel / Universal `.dmg`
             - Signed Auto-Updater (`latest.json`) across Windows & macOS
+            - Official Website & Docs: https://mstrq4.github.io/aura-bridge-web/
           releaseDraft: false
           prerelease: false
           args: --target ${{ matrix.target }}
 
-      - name: Build Custom Aura Multi-Step Setup Wizard (Windows)
+      - name: Build Custom AuraBridge Setup Wizard (Windows)
         if: ${{ matrix.is_windows }}
         shell: pwsh
         run: |
@@ -92,14 +93,19 @@ jobs:
           cargo build --release -p claude-switch-pro-setup --target ${{ matrix.target }}
           New-Item -ItemType Directory -Force -Path dist-setup | Out-Null
           $wizOut = "target/${{ matrix.target }}/release/ClaudeSwitchPro-Setup.exe"
+          Copy-Item $wizOut "dist-setup/AuraBridge-Setup-${{ matrix.arch_label }}.exe" -Force
           Copy-Item $wizOut "dist-setup/ClaudeSwitchPro-Setup-${{ matrix.arch_label }}.exe" -Force
+          Copy-Item $bin "dist-setup/AuraBridge-${{ matrix.arch_label }}-portable.exe" -Force
 
-      - name: Upload Aura Setup Wizard to Release (Windows)
+      - name: Upload AuraBridge Installers to Release (Windows)
         if: ${{ matrix.is_windows && startsWith(github.ref, 'refs/tags/v') }}
         uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref_name }}
-          files: dist-setup/ClaudeSwitchPro-Setup-${{ matrix.arch_label }}.exe
+          files: |
+            dist-setup/AuraBridge-Setup-${{ matrix.arch_label }}.exe
+            dist-setup/AuraBridge-${{ matrix.arch_label }}-portable.exe
+            dist-setup/ClaudeSwitchPro-Setup-${{ matrix.arch_label }}.exe
 

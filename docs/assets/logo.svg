@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" fill="none">
+  <defs>
+    <linearGradient id="ab-bg" x1="16" y1="16" x2="240" y2="240" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0C0E1E"/>
+      <stop offset="100%" stop-color="#181138"/>
+    </linearGradient>
+    <linearGradient id="ab-arch" x1="60" y1="158" x2="196" y2="158" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FB7185"/>
+      <stop offset="50%" stop-color="#C084FC"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+    <linearGradient id="ab-chord" x1="76" y1="164" x2="180" y2="164" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#F97316"/>
+      <stop offset="100%" stop-color="#34D399"/>
+    </linearGradient>
+    <radialGradient id="ab-glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 96) rotate(90) scale(90)">
+      <stop stop-color="#A855F7" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#0C0E1E" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="16" y="16" width="224" height="224" rx="58" fill="url(#ab-bg)" stroke="rgba(255,255,255,0.22)" stroke-width="2.5"/>
+  <circle cx="128" cy="96" r="88" fill="url(#ab-glow)"/>
+  <rect x="74" y="154" width="108" height="6" rx="3" fill="rgba(255,255,255,0.18)"/>
+  <path d="M66 157 C80 68, 176 68, 190 157" stroke="url(#ab-arch)" stroke-width="11" stroke-linecap="round"/>
+  <path d="M78 162 C104 116, 152 116, 178 162" stroke="url(#ab-chord)" stroke-width="5.5" stroke-linecap="round"/>
+  <circle cx="66" cy="157" r="16" fill="#FB7185"/>
+  <circle cx="66" cy="157" r="7" fill="#FFFFFF"/>
+  <circle cx="190" cy="157" r="16" fill="#38BDF8"/>
+  <circle cx="190" cy="157" r="7" fill="#FFFFFF"/>
+  <polygon points="128,62 147,86 128,110 109,86" fill="#C084FC" stroke="#FFFFFF" stroke-width="2"/>
+  <polygon points="128,74 138,86 128,98 118,86" fill="#FFFFFF"/>
+</svg>

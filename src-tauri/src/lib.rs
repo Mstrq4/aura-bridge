@@ -9,6 +9,7 @@ use tauri::{
 use tauri_plugin_autostart::MacosLauncher;
 use tauri_plugin_updater::UpdaterExt;
 
+const APP_ICON_PNG: &[u8] = include_bytes!("../../assets/app-icon.png");
 const TRAY_ONLINE_PNG: &[u8] = include_bytes!("../../assets/tray-online.png");
 const TRAY_OFFLINE_PNG: &[u8] = include_bytes!("../../assets/tray-offline.png");
 
@@ -148,7 +149,7 @@ pub fn run() {
             let st_for_menu = bridge_state.clone();
             TrayIconBuilder::with_id("main-tray")
                 .icon(tray_img)
-                .tooltip("Claude Switch Pro — Aura Bridge (18787)")
+                .tooltip("AuraBridge — AI Responses Bridge (18787)")
                 .menu(&tray_menu)
                 .show_menu_on_left_click(false)
                 .on_tray_icon_event(|tray, event| {
@@ -181,6 +182,12 @@ pub fn run() {
                 })
                 .build(app)?;
 
+            if let Some(win) = app.get_webview_window("main") {
+                if let Ok(win_icon) = Image::from_bytes(APP_ICON_PNG) {
+                    let _ = win.set_icon(win_icon);
+                }
+            }
+
             if start_minimized {
                 if let Some(win) = app.get_webview_window("main") {
                     let _ = win.hide();
@@ -202,5 +209,5 @@ pub fn run() {
 
     builder
         .run(tauri::generate_context!())
-        .expect("error while running Claude Switch Pro");
+        .expect("error while running AuraBridge");
 }

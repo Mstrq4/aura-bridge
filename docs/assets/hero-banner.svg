@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#090A14"/>
+      <stop offset="55%" stop-color="#131032"/>
+      <stop offset="100%" stop-color="#0B192C"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FB7185"/>
+      <stop offset="50%" stop-color="#C084FC"/>
+      <stop offset="100%" stop-color="#38BDF8"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="420" rx="28" fill="url(#bg)"/>
+  <circle cx="240" cy="90" r="180" fill="#EC4899" fill-opacity="0.14"/>
+  <circle cx="960" cy="340" r="210" fill="#0EA5E9" fill-opacity="0.14"/>
+  <rect x="64" y="64" width="120" height="120" rx="30" fill="#11132A" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+  <path d="M92 144 C102 92, 146 92, 156 144" stroke="url(#accent)" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="92" cy="144" r="9" fill="#FB7185"/><circle cx="92" cy="144" r="4" fill="#FFF"/>
+  <circle cx="156" cy="144" r="9" fill="#38BDF8"/><circle cx="156" cy="144" r="4" fill="#FFF"/>
+  <polygon points="124,84 136,100 124,116 112,100" fill="#C084FC" stroke="#FFF" stroke-width="1.5"/>
+  <text x="212" y="114" fill="#F8FAFC" font-family="Segoe UI, system-ui, sans-serif" font-size="48" font-weight="800">AuraBridge v2.1</text>
+  <text x="212" y="152" fill="#94A3B8" font-family="Segoe UI, system-ui, sans-serif" font-size="21">Universal AI Agent Bridge · Claude Code · Claude Desktop · DeepSeek Hermes</text>
+  <rect x="212" y="172" width="176" height="32" rx="16" fill="rgba(56,189,248,0.16)" stroke="rgba(56,189,248,0.45)"/>
+  <text x="300" y="193" text-anchor="middle" fill="#38BDF8" font-family="Consolas, monospace" font-size="14" font-weight="700">127.0.0.1:18787 Rust</text>
+  <rect x="400" y="172" width="196" height="32" rx="16" fill="rgba(168,85,247,0.18)" stroke="rgba(168,85,247,0.45)"/>
+  <text x="498" y="193" text-anchor="middle" fill="#D8B4FE" font-family="Consolas, monospace" font-size="14" font-weight="700">/v1/messages -> /responses</text>
+  <rect x="608" y="172" width="178" height="32" rx="16" fill="rgba(16,185,129,0.16)" stroke="rgba(16,185,129,0.45)"/>
+  <text x="697" y="193" text-anchor="middle" fill="#34D399" font-family="Consolas, monospace" font-size="14" font-weight="700">Pre-Commit 429 Shield</text>
+  <rect x="64" y="246" width="250" height="114" rx="18" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.14)"/>
+  <text x="88" y="284" fill="#FB7185" font-family="Segoe UI, sans-serif" font-size="15" font-weight="700">ZERO NODE.JS / ZERO DELAY</text>
+  <text x="88" y="318" fill="#F8FAFC" font-family="Segoe UI, sans-serif" font-size="26" font-weight="800">&lt; 100ms Cold Boot</text>
+  <text x="88" y="344" fill="#94A3B8" font-family="Segoe UI, sans-serif" font-size="14">Tauri v2 Native WebView2 + Rust</text>
+  <rect x="336" y="246" width="250" height="114" rx="18" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.14)"/>
+  <text x="360" y="284" fill="#C084FC" font-family="Segoe UI, sans-serif" font-size="15" font-weight="700">MULTIMODAL + XHIGH</text>
+  <text x="360" y="318" fill="#F8FAFC" font-family="Segoe UI, sans-serif" font-size="26" font-weight="800">Vision · PDF · Audio</text>
+  <text x="360" y="344" fill="#94A3B8" font-family="Segoe UI, sans-serif" font-size="14">230+ MCP Tools + Hash Codec</text>
+  <rect x="608" y="246" width="250" height="114" rx="18" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.14)"/>
+  <text x="632" y="284" fill="#38BDF8" font-family="Segoe UI, sans-serif" font-size="15" font-weight="700">FRONTIER ROUTING</text>
+  <text x="632" y="318" fill="#F8FAFC" font-family="Segoe UI, sans-serif" font-size="26" font-weight="800">gpt-6.1-sol &amp; Astra</text>
+  <text x="632" y="344" fill="#94A3B8" font-family="Segoe UI, sans-serif" font-size="14">Automatic Opus / Sonnet / Haiku</text>
+  <rect x="880" y="246" width="256" height="114" rx="18" fill="rgba(16,185,129,0.09)" stroke="rgba(16,185,129,0.4)"/>
+  <text x="904" y="284" fill="#34D399" font-family="Segoe UI, sans-serif" font-size="15" font-weight="700">WINDOWS + MACOS</text>
+  <text x="904" y="318" fill="#F8FAFC" font-family="Segoe UI, sans-serif" font-size="26" font-weight="800">x64 · ARM64 · Universal</text>
+  <text x="904" y="344" fill="#94A3B8" font-family="Segoe UI, sans-serif" font-size="14">Signed Auto-Updates via GitHub</text>
+</svg>

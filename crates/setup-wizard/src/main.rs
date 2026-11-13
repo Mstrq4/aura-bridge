@@ -23,6 +23,7 @@ const APP_ICON_ICO: &[u8] = include_bytes!("../../../assets/app.ico");
 const NOTIFY_ICON_ICO: &[u8] = include_bytes!("../../../assets/notify.ico");
 const TRAY_ONLINE_PNG: &[u8] = include_bytes!("../../../assets/tray-online.png");
 const TRAY_OFFLINE_PNG: &[u8] = include_bytes!("../../../assets/tray-offline.png");
+const WINDOW_ICON_RGBA: &[u8] = include_bytes!("../../../assets/app-icon-64.rgba");
 
 #[cfg(windows)]
 const CREATE_NO_WINDOW: u32 = 0x0800_0000;
@@ -56,6 +57,8 @@ struct IpcMessage {
     install_dir: Option<String>,
     #[serde(default)]
     current_path: Option<String>,
+    #[serde(default)]
+    url: Option<String>,
     #[serde(default = "default_true")]
     desktop_shortcut: bool,
     #[serde(default = "default_true")]
@@ -85,14 +88,14 @@ fn default_install_dir() -> PathBuf {
         let local = std::env::var("LOCALAPPDATA")
             .map(PathBuf::from)
             .unwrap_or_else(|_| PathBuf::from(r"C:\Users\Default\AppData\Local"));
-        local.join("Programs").join("ClaudeSwitchPro")
+        local.join("Programs").join("AuraBridge")
     }
     #[cfg(not(windows))]
     {
         let home = std::env::var("HOME")
             .map(PathBuf::from)
             .unwrap_or_else(|_| PathBuf::from("/tmp"));
-        home.join(".local").join("share").join("ClaudeSwitchPro")
+        home.join(".local").join("share").join("AuraBridge")
     }
 }
 
@@ -100,15 +103,42 @@ fn current_arch_label() -> String {
     format!("{}-{}", std::env::consts::OS, std::env::consts::ARCH)
 }
 
+fn open_external_url(url: &str) {
+    let trimmed = url.trim();
+    if !(trimmed.starts_with("https://") || trimmed.starts_with("http://")) {
+        return;
+    }
+    #[cfg(windows)]
+    {
+        let mut cmd = Command::new("cmd");
+        cmd.args(["/C", "start", "", trimmed])
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .creation_flags(CREATE_NO_WINDOW);
+        let _ = cmd.spawn();
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let _ = Command::new("open").arg(trimmed).spawn();
+    }
+    #[cfg(all(not(windows), not(target_os = "macos")))]
+    {
+        let _ = Command::new("xdg-open").arg(trimmed).spawn();
+    }
+}
+
 fn stop_running_instances() {
     #[cfg(windows)]
     {
-        let _ = Command::new("taskkill")
-            .args(["/F", "/IM", "claude-switch-pro.exe"])
-            .stdout(Stdio::null())
-            .stderr(Stdio::null())
-            .creation_flags(CREATE_NO_WINDOW)
-            .output();
+        for exe_name in ["AuraBridge.exe", "claude-switch-pro.exe"] {
+            let _ = Command::new("taskkill")
+                .args(["/F", "/IM", exe_name])
+                .stdout(Stdio::null())
+                .stderr(Stdio::null())
+                .creation_flags(CREATE_NO_WINDOW)
+                .output();
+        }
         thread::sleep(Duration::from_millis(350));
     }
 }
@@ -165,9 +195,9 @@ where
     F: FnMut(&str, &str, u8, &str),
 {
     let bin_name = if cfg!(windows) {
-        "claude-switch-pro.exe"
+        "AuraBridge.exe"
     } else {
-        "claude-switch-pro"
+        "aura-bridge"
     };
     let target_exe = opts.install_dir.join(bin_name);
     let assets_dir = opts.install_dir.join("assets");
@@ -247,12 +277,15 @@ where
         let uninstall_cmd = opts.install_dir.join("Uninstall.cmd");
         let uninstall_body = format!(
             "@echo off\r\n\
+             taskkill /F /IM AuraBridge.exe >nul 2>&1\r\n\
              taskkill /F /IM claude-switch-pro.exe >nul 2>&1\r\n\
              timeout /t 1 /nobreak >nul\r\n\
              powershell -NoProfile -ExecutionPolicy Bypass -Command \"\
-             $d = [Environment]::GetFolderPath('Desktop'); Remove-Item -Force -ErrorAction SilentlyContinue ($d + '\\Claude Switch Pro.lnk'); \
-             $sm = [Environment]::GetFolderPath('Programs'); Remove-Item -Force -ErrorAction SilentlyContinue ($sm + '\\Claude Switch Pro.lnk'); \
+             $d = [Environment]::GetFolderPath('Desktop'); Remove-Item -Force -ErrorAction SilentlyContinue ($d + '\\AuraBridge.lnk'); Remove-Item -Force -ErrorAction SilentlyContinue ($d + '\\Claude Switch Pro.lnk'); \
+             $sm = [Environment]::GetFolderPath('Programs'); Remove-Item -Force -ErrorAction SilentlyContinue ($sm + '\\AuraBridge.lnk'); Remove-Item -Force -ErrorAction SilentlyContinue ($sm + '\\Claude Switch Pro.lnk'); \
+             Remove-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Name 'AuraBridge' -ErrorAction SilentlyContinue; \
              Remove-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Name 'ClaudeSwitchPro' -ErrorAction SilentlyContinue; \
+             Remove-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\AuraBridge' -Recurse -Force -ErrorAction SilentlyContinue; \
              Remove-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ClaudeSwitchPro' -Recurse -Force -ErrorAction SilentlyContinue\"\r\n\
              start \"\" /b cmd /c \"timeout /t 2 >nul & rmdir /S /Q \\\"{}\\\"\"\r\n",
             opts.install_dir.display()
@@ -260,14 +293,20 @@ where
         let _ = fs::write(&uninstall_cmd, uninstall_body);
         let uninst_str = ps_escape(&uninstall_cmd.to_string_lossy());
 
-        let mut script = String::from("$ws = New-Object -ComObject WScript.Shell; ");
+        let mut script = String::from(
+            "$ws = New-Object -ComObject WScript.Shell; \
+             $oldD = ([Environment]::GetFolderPath('Desktop')) + '\\Claude Switch Pro.lnk'; Remove-Item -Force -ErrorAction SilentlyContinue $oldD; \
+             $oldSM = ([Environment]::GetFolderPath('Programs')) + '\\Claude Switch Pro.lnk'; Remove-Item -Force -ErrorAction SilentlyContinue $oldSM; \
+             Remove-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Name 'ClaudeSwitchPro' -ErrorAction SilentlyContinue; \
+             Remove-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ClaudeSwitchPro' -Recurse -Force -ErrorAction SilentlyContinue; ",
+        );
         if opts.desktop_shortcut {
             script.push_str(&format!(
                 "$d = [Environment]::GetFolderPath('Desktop'); \
-                 $s1 = $ws.CreateShortcut($d + '\\Claude Switch Pro.lnk'); \
+                 $s1 = $ws.CreateShortcut($d + '\\AuraBridge.lnk'); \
                  $s1.TargetPath = '{exe_str}'; \
                  $s1.IconLocation = '{ico_str},0'; \
-                 $s1.Description = 'Claude Switch Pro — Aura Bridge Control Center'; \
+                 $s1.Description = 'AuraBridge — Universal AI Responses Control Center'; \
                  $s1.WorkingDirectory = '{dir_str}'; \
                  $s1.Save(); "
             ));
@@ -275,20 +314,21 @@ where
         if opts.start_menu_shortcut {
             script.push_str(&format!(
                 "$sm = [Environment]::GetFolderPath('Programs'); \
-                 $s2 = $ws.CreateShortcut($sm + '\\Claude Switch Pro.lnk'); \
+                 $s2 = $ws.CreateShortcut($sm + '\\AuraBridge.lnk'); \
                  $s2.TargetPath = '{exe_str}'; \
                  $s2.IconLocation = '{ico_str},0'; \
-                 $s2.Description = 'Claude Switch Pro'; \
+                 $s2.Description = 'AuraBridge — AI Responses Bridge'; \
                  $s2.WorkingDirectory = '{dir_str}'; \
                  $s2.Save(); \
-                 $reg = 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\ClaudeSwitchPro'; \
+                 $reg = 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\AuraBridge'; \
                  New-Item -Path $reg -Force | Out-Null; \
-                 Set-ItemProperty -Path $reg -Name 'DisplayName' -Value 'Claude Switch Pro — Aura Bridge Control Center'; \
+                 Set-ItemProperty -Path $reg -Name 'DisplayName' -Value 'AuraBridge — Universal AI Responses Control Center'; \
                  Set-ItemProperty -Path $reg -Name 'DisplayVersion' -Value '{ver}'; \
                  Set-ItemProperty -Path $reg -Name 'Publisher' -Value 'Mstrq4 (Open Source)'; \
                  Set-ItemProperty -Path $reg -Name 'DisplayIcon' -Value '{ico_str}'; \
                  Set-ItemProperty -Path $reg -Name 'InstallLocation' -Value '{dir_str}'; \
                  Set-ItemProperty -Path $reg -Name 'UninstallString' -Value 'cmd.exe /c \"{uninst_str}\"'; \
+                 Set-ItemProperty -Path $reg -Name 'URLInfoAbout' -Value 'https://github.com/Mstrq4/aura-bridge'; \
                  Set-ItemProperty -Path $reg -Name 'NoModify' -Value 1 -Type DWord; \
                  Set-ItemProperty -Path $reg -Name 'NoRepair' -Value 1 -Type DWord; "
             ));
@@ -314,10 +354,10 @@ where
         let run_script = if opts.auto_start {
             format!(
                 "New-Item -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Force | Out-Null; \
-                 Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Name 'ClaudeSwitchPro' -Value '{exe_quoted}'"
+                 Set-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Name 'AuraBridge' -Value '{exe_quoted}'"
             )
         } else {
-            "Remove-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Name 'ClaudeSwitchPro' -ErrorAction SilentlyContinue".to_string()
+            "Remove-ItemProperty -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run' -Name 'AuraBridge' -ErrorAction SilentlyContinue".to_string()
         };
         let _ = run_hidden_powershell(&run_script);
     }
@@ -423,10 +463,12 @@ fn main() {
     let event_loop = EventLoopBuilder::<WizardEvent>::with_user_event().build();
     let proxy_ipc = event_loop.create_proxy();
 
+    let window_icon = tao::window::Icon::from_rgba(WINDOW_ICON_RGBA.to_vec(), 64, 64).ok();
     let window = WindowBuilder::new()
-        .with_title("Claude Switch Pro — Setup Wizard")
-        .with_inner_size(LogicalSize::new(900.0, 640.0))
-        .with_min_inner_size(LogicalSize::new(780.0, 560.0))
+        .with_title("AuraBridge — Setup Wizard")
+        .with_inner_size(LogicalSize::new(980.0, 680.0))
+        .with_min_inner_size(LogicalSize::new(820.0, 600.0))
+        .with_window_icon(window_icon)
         .build(&event_loop)
         .expect("Failed to create installer window");
 
@@ -434,13 +476,17 @@ fn main() {
     let wv_ipc_handle = webview_ref.clone();
 
     let default_dir = default_install_dir();
-    let existing_installed = default_dir
-        .join(if cfg!(windows) {
-            "claude-switch-pro.exe"
-        } else {
-            "claude-switch-pro"
-        })
-        .exists();
+    let legacy_installed = std::env::var_os("LOCALAPPDATA")
+        .map(|l| PathBuf::from(l).join("Programs").join("ClaudeSwitchPro").join("claude-switch-pro.exe").exists())
+        .unwrap_or(false);
+    let existing_installed = legacy_installed
+        || default_dir
+            .join(if cfg!(windows) {
+                "AuraBridge.exe"
+            } else {
+                "aura-bridge"
+            })
+            .exists();
     let init_payload = json!({
         "version": env!("CARGO_PKG_VERSION"),
         "arch": current_arch_label(),
@@ -498,12 +544,17 @@ fn main() {
                         .map(PathBuf::from)
                         .unwrap_or_else(default_install_dir);
                     let exe = dir.join(if cfg!(windows) {
-                        "claude-switch-pro.exe"
+                        "AuraBridge.exe"
                     } else {
-                        "claude-switch-pro"
+                        "aura-bridge"
                     });
                     launch_installed_app(&exe);
                     let _ = proxy_ipc.send_event(WizardEvent::RequestClose);
+                }
+                "open_url" => {
+                    if let Some(u) = msg.url.as_deref() {
+                        open_external_url(u);
+                    }
                 }
                 "close" => {
                     let _ = proxy_ipc.send_event(WizardEvent::RequestClose);

@@ -1,4 +1,4 @@
-use crate::config::{telemetry_file_path, BridgeConfig};
+use crate::config::{legacy_app_data_dir, telemetry_file_path, BridgeConfig};
 use axum::http::HeaderMap;
 use chrono::Utc;
 use serde::{Deserialize, Serialize};
@@ -105,14 +105,19 @@ impl TelemetryStore {
                 }
             }
         }
-        // Migrate telemetry from legacy Node bridge if available
-        let legacy = PathBuf::from(
-            r"H:\Projects\Backend-API\Active\claude-responses-bridge\logs\telemetry.json",
-        );
-        if legacy.exists() {
-            if let Ok(raw) = fs::read_to_string(&legacy) {
-                if let Ok(parsed) = serde_json::from_str::<TelemetryStore>(&raw) {
-                    return parsed;
+        // Migrate telemetry from previous Aura/ClaudeSwitchPro profile or legacy Node bridge if available
+        let candidates = [
+            legacy_app_data_dir().join("telemetry.json"),
+            PathBuf::from(
+                r"H:\Projects\Backend-API\Active\claude-responses-bridge\logs\telemetry.json",
+            ),
+        ];
+        for legacy in candidates {
+            if legacy.exists() {
+                if let Ok(raw) = fs::read_to_string(&legacy) {
+                    if let Ok(parsed) = serde_json::from_str::<TelemetryStore>(&raw) {
+                        return parsed;
+                    }
                 }
             }
         }

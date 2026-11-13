@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::time::Duration;
 
-pub const DEFAULT_GITHUB_REPO: &str = "Mstrq4/claude-switch-pro";
+pub const DEFAULT_GITHUB_REPO: &str = "Mstrq4/aura-bridge";
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -53,7 +53,7 @@ pub async fn check_github_updates(current_version: &str, repo: Option<&str>) -> 
 
     let client = Client::builder()
         .timeout(Duration::from_secs(10))
-        .user_agent(format!("claude-switch-pro/{current_version}"))
+        .user_agent(format!("aurabridge/{current_version}"))
         .build()
         .ok();
 

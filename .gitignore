@@ -18,6 +18,9 @@ telemetry.json
 *.exe
 !assets/*.ico
 !assets/*.png
+!assets/*.svg
+!assets/*.rgba
 !src-tauri/icons/**
+!docs/assets/**
 .DS_Store
 Thumbs.db

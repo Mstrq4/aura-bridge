@@ -1003,7 +1003,7 @@ mod tests {
         let mut html_resp = String::new();
         html_stream.read_to_string(&mut html_resp).await.unwrap();
         assert!(html_resp.contains("200 OK"));
-        assert!(html_resp.contains("Claude Switch Pro"));
+        assert!(html_resp.contains("AuraBridge"));
         assert!(!html_resp.contains("fonts.googleapis.com"));
 
         srv.abort();

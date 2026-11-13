@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 360" fill="none">
+  <rect width="1200" height="360" rx="24" fill="#0B0D18"/>
+  <text x="48" y="52" fill="#F8FAFC" font-family="Segoe UI, sans-serif" font-size="25" font-weight="800">AuraBridge v2.1 vs. Legacy Claude Responses Switch</text>
+  <rect x="48" y="84" width="532" height="240" rx="18" fill="#161433" stroke="#10B981" stroke-opacity="0.55"/>
+  <text x="76" y="122" fill="#34D399" font-family="Segoe UI, sans-serif" font-size="20" font-weight="800">AuraBridge v2.1 (Unified Tauri + Rust)</text>
+  <text x="76" y="158" fill="#E2E8F0" font-family="Segoe UI, sans-serif" font-size="15">✓ Embedded Pure-Rust HTTP/SSE Engine (Zero Node.js)</text>
+  <text x="76" y="188" fill="#E2E8F0" font-family="Segoe UI, sans-serif" font-size="15">✓ Synchronous Port Bind &lt; 100ms Startup (No Blank Window)</text>
+  <text x="76" y="218" fill="#E2E8F0" font-family="Segoe UI, sans-serif" font-size="15">✓ Multimodal Vision, PDF &amp; Audio + xhigh Reasoning</text>
+  <text x="76" y="248" fill="#E2E8F0" font-family="Segoe UI, sans-serif" font-size="15">✓ 230+ MCP Tool Sanitizer &amp; Pre-Commit 429 Shield</text>
+  <text x="76" y="278" fill="#E2E8F0" font-family="Segoe UI, sans-serif" font-size="15">✓ Windows x64/ARM64 &amp; macOS Universal + Auto-Updater</text>
+  <rect x="620" y="84" width="532" height="240" rx="18" fill="#171923" stroke="#F43F5E" stroke-opacity="0.45"/>
+  <text x="648" y="122" fill="#FB7185" font-family="Segoe UI, sans-serif" font-size="20" font-weight="800">Legacy Switch (Launcher Wrapper)</text>
+  <text x="648" y="158" fill="#94A3B8" font-family="Segoe UI, sans-serif" font-size="15">✗ Requires external Node.js process &amp; external browser window</text>
+  <text x="648" y="188" fill="#94A3B8" font-family="Segoe UI, sans-serif" font-size="15">✗ Cold grey-screen delay &amp; broken render-blocking fonts</text>
+  <text x="648" y="218" fill="#94A3B8" font-family="Segoe UI, sans-serif" font-size="15">✗ Basic env switcher without live protocol translation</text>
+  <text x="648" y="248" fill="#94A3B8" font-family="Segoe UI, sans-serif" font-size="15">✗ No per-agent telemetry, no 429 shield, no tool codec</text>
+  <text x="648" y="278" fill="#94A3B8" font-family="Segoe UI, sans-serif" font-size="15">✗ Windows-only manual binary replacement without auto-update</text>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" fill="none">
+  <rect width="960" height="600" rx="22" fill="#FAF7F5"/>
+  <rect x="24" y="24" width="912" height="62" rx="16" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <circle cx="56" cy="55" r="14" fill="#7C3AED"/>
+  <text x="82" y="61" fill="#0F172A" font-family="Segoe UI, sans-serif" font-size="17" font-weight="800">AuraBridge — Setup Wizard (v2.1.0)</text>
+  <rect x="24" y="104" width="218" height="42" rx="12" fill="#ECFDF5" stroke="#10B981"/><text x="133" y="130" text-anchor="middle" fill="#059669" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">1. Welcome</text>
+  <rect x="256" y="104" width="218" height="42" rx="12" fill="#ECFDF5" stroke="#10B981"/><text x="365" y="130" text-anchor="middle" fill="#059669" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">2. Path &amp; Options</text>
+  <rect x="488" y="104" width="218" height="42" rx="12" fill="#ECFDF5" stroke="#10B981"/><text x="597" y="130" text-anchor="middle" fill="#059669" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">3. Installing (6 Steps)</text>
+  <rect x="720" y="104" width="216" height="42" rx="12" fill="#FDF2F8" stroke="#DB2777"/><text x="828" y="130" text-anchor="middle" fill="#DB2777" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">4. Complete &amp; Launch</text>
+  <rect x="24" y="164" width="912" height="412" rx="20" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <circle cx="480" cy="222" r="28" fill="#ECFDF5" stroke="#10B981" stroke-width="2"/><text x="480" y="230" text-anchor="middle" fill="#059669" font-family="Segoe UI, sans-serif" font-size="24" font-weight="800">✓</text>
+  <text x="480" y="276" text-anchor="middle" fill="#0F172A" font-family="Segoe UI, sans-serif" font-size="22" font-weight="800">AuraBridge Installed Successfully</text>
+  <rect x="52" y="304" width="420" height="92" rx="14" fill="#F8FAFC" stroke="#CBD5E1"/><text x="72" y="336" fill="#0F172A" font-family="Segoe UI, sans-serif" font-size="14" font-weight="700">Local Bridge Ready · 127.0.0.1:18787</text><text x="72" y="364" fill="#64748B" font-family="Segoe UI, sans-serif" font-size="12">Pure Rust HTTP/SSE + Pre-Commit 429 Shield</text>
+  <rect x="488" y="304" width="420" height="92" rx="14" fill="#F8FAFC" stroke="#CBD5E1"/><text x="508" y="336" fill="#0F172A" font-family="Segoe UI, sans-serif" font-size="14" font-weight="700">Synced CLI &amp; Frontier Models</text><text x="508" y="364" fill="#64748B" font-family="Segoe UI, sans-serif" font-size="12">gpt-6.1-sol · gpt-6-astra · gpt-5.6-sol</text>
+  <rect x="52" y="408" width="420" height="84" rx="14" fill="#F8FAFC" stroke="#CBD5E1"/><text x="72" y="440" fill="#0F172A" font-family="Segoe UI, sans-serif" font-size="14" font-weight="700">Agents Configured</text><text x="72" y="466" fill="#64748B" font-family="Segoe UI, sans-serif" font-size="12">Claude Code CLI · Claude Desktop · DeepSeek Hermes</text>
+  <rect x="488" y="408" width="420" height="84" rx="14" fill="#FDF2F8" stroke="#F472B6"/><text x="508" y="440" fill="#DB2777" font-family="Segoe UI, sans-serif" font-size="14" font-weight="700">AgentRouter Partner Perks</text><text x="508" y="466" fill="#475569" font-family="Segoe UI, sans-serif" font-size="12">$175 Sign-Up Credit + $25 Daily Free Credit</text>
+  <rect x="330" y="512" width="300" height="44" rx="12" fill="#7C3AED"/><text x="480" y="539" text-anchor="middle" fill="#FFFFFF" font-family="Segoe UI, sans-serif" font-size="14" font-weight="700">Launch AuraBridge Control Center</text>
+</svg>

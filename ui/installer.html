@@ -1,33 +1,34 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl" data-theme="light">
+<html lang="en" dir="ltr" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claude Switch Pro — Setup Wizard</title>
+  <title>AuraBridge — Setup Wizard</title>
   <style>
     :root {
-      --font-ar: "Segoe UI", Tahoma, system-ui, -apple-system, sans-serif;
       --font-en: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --font-ar: "Segoe UI", Tahoma, system-ui, -apple-system, sans-serif;
       --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
       --bg: #faf7f5;
       --mesh:
-        radial-gradient(at 15% 15%, rgba(255, 218, 190, 0.72) 0px, transparent 52%),
-        radial-gradient(at 86% 18%, rgba(226, 206, 255, 0.66) 0px, transparent 52%),
-        radial-gradient(at 50% 85%, rgba(214, 240, 255, 0.64) 0px, transparent 56%);
-      --card: rgba(255, 255, 255, 0.84);
-      --card-border: rgba(255, 255, 255, 0.94);
+        radial-gradient(at 14% 14%, rgba(255, 218, 190, 0.72) 0px, transparent 52%),
+        radial-gradient(at 86% 18%, rgba(226, 206, 255, 0.68) 0px, transparent 52%),
+        radial-gradient(at 50% 86%, rgba(214, 240, 255, 0.64) 0px, transparent 56%);
+      --card: rgba(255, 255, 255, 0.88);
+      --card-elevated: rgba(255, 255, 255, 0.96);
+      --card-border: rgba(255, 255, 255, 0.95);
       --subtle: rgba(241, 245, 249, 0.86);
-      --border: rgba(203, 213, 225, 0.72);
+      --border: rgba(203, 213, 225, 0.78);
       --text: #0f172a;
-      --text-sec: #475569;
+      --text-sec: #334155;
       --muted: #64748b;
       --accent: #db2777;
       --accent-2: #0284c7;
       --accent-v: #7c3aed;
       --ok: #059669;
-      --ok-bg: rgba(16, 185, 129, 0.14);
+      --ok-bg: rgba(16, 185, 129, 0.12);
       --err: #dc2626;
-      --shadow: 0 22px 54px -16px rgba(100, 116, 139, 0.28);
+      --shadow: 0 22px 54px -16px rgba(100, 116, 139, 0.25);
     }
 
     [data-theme="dark"] {
@@ -36,10 +37,11 @@
         radial-gradient(at 18% 15%, rgba(124, 58, 237, 0.24) 0px, transparent 52%),
         radial-gradient(at 85% 20%, rgba(236, 72, 153, 0.2) 0px, transparent 50%),
         radial-gradient(at 50% 88%, rgba(14, 165, 233, 0.16) 0px, transparent 55%);
-      --card: rgba(20, 26, 45, 0.84);
-      --card-border: rgba(255, 255, 255, 0.11);
-      --subtle: rgba(30, 41, 59, 0.64);
-      --border: rgba(71, 85, 105, 0.55);
+      --card: rgba(20, 26, 45, 0.86);
+      --card-elevated: rgba(28, 36, 62, 0.92);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --subtle: rgba(30, 41, 59, 0.7);
+      --border: rgba(71, 85, 105, 0.58);
       --text: #f8fafc;
       --text-sec: #cbd5e1;
       --muted: #94a3b8;
@@ -49,7 +51,7 @@
       --ok: #34d399;
       --ok-bg: rgba(16, 185, 129, 0.18);
       --err: #f87171;
-      --shadow: 0 26px 64px -18px rgba(0, 0, 0, 0.62);
+      --shadow: 0 26px 64px -18px rgba(0, 0, 0, 0.65);
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -60,19 +62,20 @@
       background: var(--bg);
       background-image: var(--mesh);
       color: var(--text);
-      font-family: var(--font-ar);
+      font-family: var(--font-en);
       -webkit-font-smoothing: antialiased;
       user-select: none;
     }
-    html[lang="en"] body { font-family: var(--font-en); }
+    html[lang="ar"] body { font-family: var(--font-ar); }
     .mono { font-family: var(--font-mono); }
+    [dir="rtl"] .flip-rtl { transform: rotate(180deg); }
 
     .wizard-shell {
       display: flex;
       flex-direction: column;
       height: 100vh;
-      padding: 18px 22px 20px;
-      gap: 14px;
+      padding: 16px 20px;
+      gap: 12px;
     }
 
     .topbar {
@@ -93,19 +96,16 @@
       align-items: center;
       gap: 12px;
     }
-
-    .orb-mini {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 30% 30%, #ffffff, #f472b6 36%, #7c3aed 72%, #0284c7 100%);
-      box-shadow: 0 0 18px rgba(236, 72, 153, 0.42);
-      position: relative;
+    .brand-logo {
+      width: 38px;
+      height: 38px;
       flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
-
-    .brand-name { font-size: 0.98rem; font-weight: 800; letter-spacing: -0.01em; }
-    .brand-meta { font-size: 0.74rem; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+    .brand-name { font-size: 1rem; font-weight: 800; letter-spacing: -0.01em; }
+    .brand-meta { font-size: 0.74rem; color: var(--muted); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-top: 2px; }
 
     .pill {
       display: inline-flex;
@@ -119,14 +119,22 @@
       font-weight: 700;
       color: var(--text-sec);
     }
+    .pill-ok {
+      background: var(--ok-bg);
+      border-color: rgba(16, 185, 129, 0.42);
+      color: var(--ok);
+    }
 
     .top-actions { display: flex; gap: 8px; align-items: center; }
 
     .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       background: var(--subtle);
       color: var(--text);
       border: 1px solid var(--border);
-      padding: 6px 11px;
+      padding: 7px 12px;
       border-radius: 10px;
       font-family: inherit;
       font-size: 0.78rem;
@@ -136,7 +144,44 @@
     }
     .btn-ghost:hover { transform: translateY(-1px); }
 
-    /* Stepper Indicator */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-v));
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 22px -8px rgba(219, 39, 119, 0.45);
+      transition: transform 130ms ease, opacity 130ms ease;
+    }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .btn-emerald {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--ok-bg);
+      color: var(--ok);
+      border: 1px solid rgba(16, 185, 129, 0.48);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.84rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 130ms ease, background 130ms ease;
+    }
+    .btn-emerald:hover { transform: translateY(-1px); }
+
     .stepper {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -186,72 +231,113 @@
       color: #fff;
     }
 
-    /* Stage */
     .stage-card {
       flex: 1;
       min-height: 0;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      padding: 22px 24px;
+      padding: 20px 22px;
       border-radius: 22px;
       background: var(--card);
       border: 1px solid var(--card-border);
       box-shadow: var(--shadow);
       backdrop-filter: blur(20px);
-      overflow-y: auto;
+      overflow: hidden;
     }
 
-    .pane { display: none; flex-direction: column; gap: 16px; height: 100%; }
+    .pane { display: none; flex-direction: column; justify-content: space-between; gap: 14px; height: 100%; min-height: 0; }
     .pane.active { display: flex; }
 
-    .hero-grid {
+    /* Step 1 */
+    .welcome-grid {
       display: grid;
-      grid-template-columns: 160px 1fr;
-      gap: 22px;
-      align-items: center;
-      margin: auto 0;
+      grid-template-columns: 310px 1fr;
+      gap: 20px;
+      align-items: stretch;
+      flex: 1;
+      min-height: 0;
     }
-
-    .orb-showcase {
-      width: 148px;
-      height: 148px;
-      margin: auto;
-      border-radius: 50%;
+    .protocol-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(160deg, #0b0e1e 0%, #171236 58%, #0f1c2e 100%);
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.14);
       position: relative;
-      background:
-        radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.96) 0%, rgba(244, 114, 182, 0.48) 38%, rgba(124, 58, 237, 0.62) 72%, rgba(2, 132, 199, 0.72) 100%);
-      box-shadow:
-        0 18px 42px -10px rgba(219, 39, 119, 0.42),
-        0 0 0 1px rgba(255, 255, 255, 0.65) inset;
-      animation: floatOrb 4.5s ease-in-out infinite;
+      overflow: hidden;
     }
-    @keyframes floatOrb {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-6px); }
+    .protocol-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
     }
-
-    .hero-title { font-size: 1.48rem; font-weight: 800; line-height: 1.3; }
-    .hero-sub { font-size: 0.88rem; color: var(--text-sec); line-height: 1.6; margin-top: 6px; }
+    .protocol-nodes {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .proto-box {
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      font-size: 0.74rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .proto-arrow {
+      display: flex;
+      justify-content: center;
+      color: #c084fc;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .hero-col {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 12px;
+    }
+    .hero-title { font-size: 1.48rem; font-weight: 800; line-height: 1.25; }
+    .hero-sub { font-size: 0.86rem; color: var(--text-sec); line-height: 1.55; }
 
     .feat-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
       gap: 10px;
-      margin-top: 10px;
     }
     .feat-item {
-      padding: 10px 12px;
-      border-radius: 13px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 12px;
+      border-radius: 14px;
       background: var(--subtle);
       border: 1px solid var(--border);
-      font-size: 0.8rem;
-      line-height: 1.45;
     }
-    .feat-item strong { display: block; color: var(--text); margin-bottom: 2px; font-size: 0.82rem; }
-    .feat-item span { color: var(--muted); font-size: 0.75rem; }
+    .feat-ico {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--card-elevated);
+      border: 1px solid var(--border);
+      color: var(--accent-v);
+      flex-shrink: 0;
+    }
+    .feat-item strong { display: block; color: var(--text); font-size: 0.82rem; margin-bottom: 2px; }
+    .feat-item span { color: var(--muted); font-size: 0.74rem; line-height: 1.4; display: block; }
 
-    /* Step 2 Form */
+    /* Step 2 */
     .field-group { display: flex; flex-direction: column; gap: 6px; }
     .field-label { font-size: 0.82rem; font-weight: 700; color: var(--text-sec); }
     .path-row { display: flex; gap: 8px; }
@@ -268,6 +354,19 @@
     }
     .input:focus { border-color: var(--accent); }
 
+    .migration-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: var(--ok-bg);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: var(--ok);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
     .options-list {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -277,15 +376,16 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 12px;
       padding: 12px 14px;
       border-radius: 14px;
       background: var(--subtle);
       border: 1px solid var(--border);
       cursor: pointer;
     }
+    .opt-left { display: flex; align-items: center; gap: 10px; }
     .opt-text strong { display: block; font-size: 0.82rem; }
-    .opt-text span { display: block; font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+    .opt-text span { display: block; font-size: 0.73rem; color: var(--muted); margin-top: 2px; }
     .opt-card input[type="checkbox"] {
       width: 18px;
       height: 18px;
@@ -294,13 +394,20 @@
       flex-shrink: 0;
     }
 
-    /* Step 3 Progress */
-    .progress-header {
+    .summary-strip {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: var(--subtle);
+      border: 1px dashed var(--border);
+      font-size: 0.74rem;
+      color: var(--text-sec);
     }
+
+    /* Step 3 */
+    .progress-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
     .progress-track {
       width: 100%;
       height: 12px;
@@ -316,17 +423,12 @@
       background: linear-gradient(90deg, var(--accent), var(--accent-v), var(--accent-2));
       transition: width 260ms cubic-bezier(0.16, 1, 0.3, 1);
     }
-
-    .tasks-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-    }
+    .tasks-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
     .task-row {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 9px 12px;
+      padding: 10px 12px;
       border-radius: 12px;
       background: var(--subtle);
       border: 1px solid var(--border);
@@ -334,78 +436,93 @@
       font-weight: 600;
       color: var(--muted);
     }
-    .task-row.running {
-      color: var(--text);
-      border-color: var(--accent-2);
-    }
-    .task-row.done {
-      color: var(--ok);
-      border-color: rgba(16, 185, 129, 0.45);
-      background: var(--ok-bg);
-    }
-    .task-row.error {
-      color: var(--err);
-      border-color: var(--err);
-    }
+    .task-row.running { color: var(--text); border-color: var(--accent-2); }
+    .task-row.done { color: var(--ok); border-color: rgba(16, 185, 129, 0.45); background: var(--ok-bg); }
+    .task-row.error { color: var(--err); border-color: var(--err); }
     .task-dot {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       border-radius: 50%;
       border: 2px solid currentColor;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.68rem;
+      font-size: 0.7rem;
+      font-weight: 800;
       flex-shrink: 0;
     }
-    .task-row.running .task-dot {
-      border-top-color: transparent;
-      animation: spin 0.75s linear infinite;
-    }
+    .task-row.running .task-dot { border-top-color: transparent; animation: spin 0.75s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     .log-box {
       flex: 1;
-      min-height: 92px;
-      max-height: 140px;
+      min-height: 120px;
       overflow-y: auto;
-      padding: 10px 12px;
+      padding: 12px;
       border-radius: 12px;
-      background: rgba(15, 23, 42, 0.06);
-      border: 1px solid var(--border);
+      background: #0b0e1c;
+      color: #cbd5e1;
+      border: 1px solid rgba(255, 255, 255, 0.12);
       font-family: var(--font-mono);
       font-size: 0.74rem;
-      line-height: 1.55;
-      color: var(--text-sec);
+      line-height: 1.6;
       user-select: text;
     }
-    [data-theme="dark"] .log-box { background: rgba(0, 0, 0, 0.36); }
 
-    /* Step 4 Complete */
-    .done-hero {
-      text-align: center;
-      margin: auto;
-      max-width: 540px;
+    /* Step 4 Complete Bento */
+    .done-banner {
       display: flex;
-      flex-direction: column;
       align-items: center;
-      gap: 12px;
-    }
-    .done-badge {
-      width: 68px;
-      height: 68px;
-      border-radius: 50%;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 16px;
       background: var(--ok-bg);
-      border: 2px solid var(--ok);
-      color: var(--ok);
-      display: flex;
+      border: 1px solid rgba(16, 185, 129, 0.42);
+    }
+    .done-banner-left { display: flex; align-items: center; gap: 12px; }
+    .done-check-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--ok);
+      color: #fff;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      font-size: 2rem;
-      font-weight: 800;
+      flex-shrink: 0;
     }
+    .bento-done {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      flex: 1;
+      min-height: 0;
+    }
+    .bento-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: var(--subtle);
+      border: 1px solid var(--border);
+    }
+    .bento-card.partner-highlight {
+      background: linear-gradient(135deg, rgba(219, 39, 119, 0.08), rgba(124, 58, 237, 0.09), rgba(16, 185, 129, 0.08));
+      border-color: rgba(219, 39, 119, 0.38);
+    }
+    .bento-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .bento-title { font-size: 0.86rem; font-weight: 800; color: var(--text); }
+    .bento-desc { font-size: 0.76rem; color: var(--text-sec); line-height: 1.5; }
+    .chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
 
-    /* Footer Actions */
     .wizard-footer {
       display: flex;
       align-items: center;
@@ -414,180 +531,351 @@
       padding-top: 12px;
       border-top: 1px solid var(--border);
     }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-v));
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 12px;
-      font-family: inherit;
-      font-size: 0.86rem;
-      font-weight: 700;
-      cursor: pointer;
-      box-shadow: 0 10px 22px -8px rgba(219, 39, 119, 0.45);
-      transition: transform 130ms ease, opacity 130ms ease;
-    }
-    .btn-primary:hover { transform: translateY(-1px); }
-    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
   </style>
 </head>
 <body>
   <div class="wizard-shell">
     <header class="topbar">
       <div class="brand">
-        <div class="orb-mini" aria-hidden="true"></div>
+        <div class="brand-logo" aria-hidden="true">
+          <svg width="38" height="38" viewBox="0 0 256 256" fill="none">
+            <defs>
+              <linearGradient id="wiz-bg" x1="16" y1="16" x2="240" y2="240" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#0C0E1E"/><stop offset="100%" stop-color="#181138"/>
+              </linearGradient>
+              <linearGradient id="wiz-arch" x1="60" y1="158" x2="196" y2="158" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#FB7185"/><stop offset="50%" stop-color="#C084FC"/><stop offset="100%" stop-color="#38BDF8"/>
+              </linearGradient>
+            </defs>
+            <rect x="16" y="16" width="224" height="224" rx="58" fill="url(#wiz-bg)" stroke="rgba(255,255,255,0.22)" stroke-width="4"/>
+            <path d="M66 157 C80 68, 176 68, 190 157" stroke="url(#wiz-arch)" stroke-width="14" stroke-linecap="round"/>
+            <circle cx="66" cy="157" r="16" fill="#FB7185"/><circle cx="66" cy="157" r="7" fill="#FFFFFF"/>
+            <circle cx="190" cy="157" r="16" fill="#38BDF8"/><circle cx="190" cy="157" r="7" fill="#FFFFFF"/>
+            <polygon points="128,62 147,86 128,110 109,86" fill="#C084FC" stroke="#FFFFFF" stroke-width="2.5"/>
+            <polygon points="128,74 138,86 128,98 118,86" fill="#FFFFFF"/>
+          </svg>
+        </div>
         <div>
-          <div class="brand-name" data-t="brandTitle">معالج تثبيت Claude Switch Pro</div>
+          <div class="brand-name" data-t="brandTitle">AuraBridge Setup Wizard</div>
           <div class="brand-meta">
             <span class="pill mono" id="wiz-ver">v2.1.0</span>
             <span class="pill mono" id="wiz-arch">windows-x86_64</span>
-            <span class="pill" id="wiz-mode-pill" data-t="modeFresh">تثبيت متكامل</span>
+            <span class="pill pill-ok" id="wiz-mode-pill" data-t="modeFresh">Full Installation</span>
           </div>
         </div>
       </div>
       <div class="top-actions">
-        <button type="button" class="btn-ghost" id="btn-wiz-theme" data-t="btnTheme">داكن</button>
-        <button type="button" class="btn-ghost" id="btn-wiz-lang">English</button>
+        <button type="button" class="btn-ghost" id="btn-wiz-theme" data-t="btnTheme">Dark</button>
+        <button type="button" class="btn-ghost" id="btn-wiz-lang">العربية</button>
       </div>
     </header>
 
     <div class="stepper" role="tablist">
-      <div class="step-chip active" data-step="1"><span class="step-num">1</span><span data-t="st1">الترحيب</span></div>
-      <div class="step-chip" data-step="2"><span class="step-num">2</span><span data-t="st2">المسار والخيارات</span></div>
-      <div class="step-chip" data-step="3"><span class="step-num">3</span><span data-t="st3">مراحل التثبيت</span></div>
-      <div class="step-chip" data-step="4"><span class="step-num">4</span><span data-t="st4">الاكتمال والتشغيل</span></div>
+      <div class="step-chip active" data-step="1"><span class="step-num">1</span><span data-t="st1">Welcome</span></div>
+      <div class="step-chip" data-step="2"><span class="step-num">2</span><span data-t="st2">Path &amp; Options</span></div>
+      <div class="step-chip" data-step="3"><span class="step-num">3</span><span data-t="st3">Installing</span></div>
+      <div class="step-chip" data-step="4"><span class="step-num">4</span><span data-t="st4">Complete</span></div>
     </div>
 
     <main class="stage-card">
       <!-- STEP 1 -->
       <section class="pane active" id="pane-1">
-        <div class="hero-grid">
-          <div class="orb-showcase" aria-hidden="true"></div>
-          <div>
-            <h1 class="hero-title" data-t="heroTitle">مركز تحكم وجسر نماذج AI الأصلي</h1>
-            <p class="hero-sub" data-t="heroSub">
-              تطبيق سطح مكتب مدمج فوري الإقلاع مع جسر Rust مدمج عالي الأداء ومزامنة تلقائية لـ Claude Code CLI و DeepSeek Harness وتحديثات تلقائية من GitHub.
-            </p>
+        <div class="welcome-grid">
+          <aside class="protocol-panel">
+            <div class="protocol-header">
+              <span class="pill" style="background:rgba(16,185,129,0.18);border-color:rgba(16,185,129,0.45);color:#34d399;">WebView2 + Rust</span>
+              <span class="pill mono" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.16);color:#cbd5e1;">:18787</span>
+            </div>
+
+            <div class="protocol-nodes">
+              <div class="proto-box">
+                <span>Claude Code / Desktop / Hermes</span>
+                <span class="mono" style="color:#fb7185;">/v1/messages</span>
+              </div>
+              <div class="proto-arrow">↓ 230+ MCP Tools + Vision + xhigh ↓</div>
+              <div class="proto-box" style="border-color:rgba(192,132,252,0.5);background:rgba(168,85,247,0.16);">
+                <strong>AuraBridge Core</strong>
+                <span class="mono" style="color:#d8b4fe;">429 Shield</span>
+              </div>
+              <div class="proto-arrow">↓ Zero-Loss SSE Stream ↓</div>
+              <div class="proto-box">
+                <span>OpenAI Responses Upstream</span>
+                <span class="mono" style="color:#38bdf8;">/v1/responses</span>
+              </div>
+            </div>
+
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <span class="pill mono" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.14);color:#e2e8f0;">gpt-6.1-sol</span>
+              <span class="pill mono" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.14);color:#e2e8f0;">gpt-6-astra</span>
+              <span class="pill mono" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.14);color:#e2e8f0;">gpt-5.6-sol</span>
+            </div>
+          </aside>
+
+          <div class="hero-col">
+            <div>
+              <h1 class="hero-title" data-t="heroTitle">Universal AI Agent Bridge &amp; Control Center</h1>
+              <p class="hero-sub" data-t="heroSub">
+                Instant native Tauri v2 desktop app with embedded Rust Responses API engine, automatic sync for Claude Code CLI &amp; DeepSeek Hermes, and signed GitHub auto-updates.
+              </p>
+            </div>
             <div class="feat-grid">
               <div class="feat-item">
-                <strong data-t="f1Title">إقلاع فوري بدون شاشة رمادية</strong>
-                <span data-t="f1Desc">نواة WebView2 مدمجة دون الاعتماد على متصفح خارجي أو Node.js</span>
+                <span class="feat-ico">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </span>
+                <div>
+                  <strong data-t="f1Title">Instant Cold Boot (&lt;100ms)</strong>
+                  <span data-t="f1Desc">Zero blank grey screen, zero Node.js dependency, built-in native shell</span>
+                </div>
               </div>
               <div class="feat-item">
-                <strong data-t="f2Title">محرك Responses + درع الحماية</strong>
-                <span data-t="f2Desc">دعم Vision و PDF وتفكير xhigh وحماية استباقية ضد 429</span>
+                <span class="feat-ico">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <div>
+                  <strong data-t="f2Title">Responses Engine + 429 Shield</strong>
+                  <span data-t="f2Desc">Vision, PDF, Audio, xhigh reasoning &amp; 230+ MCP tool schema sanitizer</span>
+                </div>
               </div>
               <div class="feat-item">
-                <strong data-t="f3Title">مزامنة بنقرة واحدة</strong>
-                <span data-t="f3Desc">تهيئة فورية لـ Claude Code و DeepSeek Harness و Desktop</span>
+                <span class="feat-ico">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                </span>
+                <div>
+                  <strong data-t="f3Title">1-Click Multi-Agent Sync</strong>
+                  <span data-t="f3Desc">Configures Claude Code CLI, Claude Desktop &amp; DeepSeek Hermes</span>
+                </div>
               </div>
               <div class="feat-item">
-                <strong data-t="f4Title">تحديثات GitHub التلقائية</strong>
-                <span data-t="f4Desc">تنزيل وتثبيت الإصدارات الجديدة موقّعة رقمياً بضغطة واحدة</span>
+                <span class="feat-ico">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </span>
+                <div>
+                  <strong data-t="f4Title">Signed Auto-Updates</strong>
+                  <span data-t="f4Desc">Minisign-verified releases directly from GitHub Releases</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <div class="wizard-footer">
-          <span class="pill" data-t="licenseTag">مفتوح المصدر — MIT License</span>
+          <span class="pill" data-t="licenseTag">Open Source · MIT License</span>
           <div style="display:flex;gap:8px;">
-            <button type="button" class="btn-ghost" id="btn-cancel-1" data-t="btnCancel">إلغاء</button>
-            <button type="button" class="btn-primary" id="btn-next-1" data-t="btnStart">بدء الإعداد</button>
+            <button type="button" class="btn-ghost" id="btn-cancel-1" data-t="btnCancel">Cancel</button>
+            <button type="button" class="btn-primary" id="btn-next-1">
+              <span data-t="btnStart">Configure &amp; Install</span>
+              <svg class="flip-rtl" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </button>
           </div>
         </div>
       </section>
 
       <!-- STEP 2 -->
       <section class="pane" id="pane-2">
-        <div>
-          <h2 style="font-size:1.15rem;font-weight:800;" data-t="s2Title">اختر مسار التثبيت والخيارات المتكاملة</h2>
-          <p style="font-size:0.82rem;color:var(--muted);margin-top:4px;" data-t="s2Sub">سيتم نقل إعدادات .env وإحصائياتك السابقة تلقائياً دون أي فقد.</p>
-        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <h2 style="font-size:1.18rem;font-weight:800;" data-t="s2Title">Installation Folder &amp; System Preferences</h2>
+            <p style="font-size:0.82rem;color:var(--muted);margin-top:3px;" data-t="s2Sub">Customize install location, system integration, and automatic agent configuration.</p>
+          </div>
 
-        <div class="field-group">
-          <label class="field-label" for="install-dir" data-t="lblInstallDir">مجلد التثبيت</label>
-          <div class="path-row">
-            <input type="text" class="input" id="install-dir" value="C:\Users\samsung\AppData\Local\Programs\ClaudeSwitchPro">
-            <button type="button" class="btn-ghost" id="btn-browse" data-t="btnBrowse">استعراض...</button>
+          <div class="field-group">
+            <label class="field-label" for="install-dir" data-t="lblInstallDir">Install Directory</label>
+            <div class="path-row">
+              <input type="text" class="input" id="install-dir" value="C:\Users\samsung\AppData\Local\Programs\AuraBridge">
+              <button type="button" class="btn-ghost" id="btn-browse">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+                <span data-t="btnBrowse">Browse...</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="migration-banner">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span data-t="migNote">Smart Preservation: Existing .env API keys, model presets, and telemetry.json history migrate automatically.</span>
+          </div>
+
+          <div class="options-list">
+            <label class="opt-card">
+              <div class="opt-left">
+                <span class="feat-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+                <div class="opt-text">
+                  <strong data-t="optDesktop">Desktop Shortcut</strong>
+                  <span data-t="optDesktopDesc">Create AuraBridge shortcut on Desktop</span>
+                </div>
+              </div>
+              <input type="checkbox" id="chk-desktop" checked>
+            </label>
+            <label class="opt-card">
+              <div class="opt-left">
+                <span class="feat-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg></span>
+                <div class="opt-text">
+                  <strong data-t="optStartMenu">Start Menu &amp; Registry</strong>
+                  <span data-t="optStartMenuDesc">Register Start Menu &amp; Add/Remove Programs</span>
+                </div>
+              </div>
+              <input type="checkbox" id="chk-startmenu" checked>
+            </label>
+            <label class="opt-card">
+              <div class="opt-left">
+                <span class="feat-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+                <div class="opt-text">
+                  <strong data-t="optAutoStart">Launch at Startup</strong>
+                  <span data-t="optAutoStartDesc">Keep local bridge active in System Tray</span>
+                </div>
+              </div>
+              <input type="checkbox" id="chk-autostart" checked>
+            </label>
+            <label class="opt-card">
+              <div class="opt-left">
+                <span class="feat-ico"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M9 13v2"/><path d="M15 13v2"/></svg></span>
+                <div class="opt-text">
+                  <strong data-t="optSyncApps">Auto-Sync AI Tools</strong>
+                  <span data-t="optSyncAppsDesc">Configure Claude Code, Desktop &amp; Hermes</span>
+                </div>
+              </div>
+              <input type="checkbox" id="chk-sync" checked>
+            </label>
+          </div>
+
+          <div class="summary-strip">
+            <span class="pill mono">~/.claude/settings.json</span>
+            <span class="pill mono">~/.deepseek-harness/config.json</span>
+            <span class="pill mono">HKCU\...\Uninstall\AuraBridge</span>
+            <span class="pill mono">127.0.0.1:18787</span>
           </div>
         </div>
 
-        <div class="options-list">
-          <label class="opt-card">
-            <div class="opt-text">
-              <strong data-t="optDesktop">اختصار سطح المكتب</strong>
-              <span data-t="optDesktopDesc">إضافة أيقونة Aura على سطح المكتب</span>
-            </div>
-            <input type="checkbox" id="chk-desktop" checked>
-          </label>
-          <label class="opt-card">
-            <div class="opt-text">
-              <strong data-t="optStartMenu">اختصار قائمة ابدأ</strong>
-              <span data-t="optStartMenuDesc">تثبيت التطبيق في قائمة ابدأ وإلغاء التثبيت</span>
-            </div>
-            <input type="checkbox" id="chk-startmenu" checked>
-          </label>
-          <label class="opt-card">
-            <div class="opt-text">
-              <strong data-t="optAutoStart">التشغيل مع بدء النظام</strong>
-              <span data-t="optAutoStartDesc">إبقاء الجسر جاهزاً في شريط المهام عند تسجيل الدخول</span>
-            </div>
-            <input type="checkbox" id="chk-autostart" checked>
-          </label>
-          <label class="opt-card">
-            <div class="opt-text">
-              <strong data-t="optSyncApps">مزامنة الأدوات تلقائياً</strong>
-              <span data-t="optSyncAppsDesc">تحديث Claude Code و DeepSeek Harness فور التثبيت</span>
-            </div>
-            <input type="checkbox" id="chk-sync" checked>
-          </label>
-        </div>
-
-        <div class="wizard-footer" style="margin-top:auto;">
-          <button type="button" class="btn-ghost" id="btn-back-2" data-t="btnBack">السابق</button>
-          <button type="button" class="btn-primary" id="btn-install-now" data-t="btnInstallNow">تثبيت الآن</button>
+        <div class="wizard-footer">
+          <button type="button" class="btn-ghost" id="btn-back-2">
+            <svg class="flip-rtl" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+            <span data-t="btnBack">Back</span>
+          </button>
+          <button type="button" class="btn-primary" id="btn-install-now">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span data-t="btnInstallNow">Install AuraBridge Now</span>
+          </button>
         </div>
       </section>
 
       <!-- STEP 3 -->
       <section class="pane" id="pane-3">
-        <div class="progress-header">
-          <div>
-            <h2 style="font-size:1.12rem;font-weight:800;" id="prog-heading" data-t="s3Title">جاري تثبيت المكونات وتهيئة النظام...</h2>
-            <p style="font-size:0.78rem;color:var(--muted);margin-top:2px;" id="prog-sub" data-t="s3Sub">يرجى الانتظار بضع ثوانٍ</p>
+        <div style="display:flex;flex-direction:column;gap:12px;flex:1;min-height:0;">
+          <div class="progress-header">
+            <div>
+              <h2 style="font-size:1.15rem;font-weight:800;" id="prog-heading" data-t="s3Title">Installing AuraBridge &amp; Configuring Agents...</h2>
+              <p style="font-size:0.78rem;color:var(--muted);margin-top:2px;" id="prog-sub" data-t="s3Sub">Completing 6 automated verification stages</p>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="pill mono" id="prog-timer">0.0s</span>
+              <span class="pill mono" id="prog-pct" style="font-size:0.9rem;">0%</span>
+            </div>
           </div>
-          <span class="pill mono" id="prog-pct" style="font-size:0.9rem;">0%</span>
-        </div>
 
-        <div class="progress-track">
-          <div class="progress-fill" id="prog-bar"></div>
-        </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="prog-bar"></div>
+          </div>
 
-        <div class="tasks-grid">
-          <div class="task-row" id="task-stop_existing"><span class="task-dot">1</span><span data-t="tStop">إيقاف أي عملية سابقة وتحضير المسار</span></div>
-          <div class="task-row" id="task-extract_bin"><span class="task-dot">2</span><span data-t="tExtract">نسخ التطبيق الموحد والأيقونات</span></div>
-          <div class="task-row" id="task-migrate_data"><span class="task-dot">3</span><span data-t="tMigrate">ترحيل الإعدادات والبيانات السابقة</span></div>
-          <div class="task-row" id="task-shortcuts"><span class="task-dot">4</span><span data-t="tShortcuts">تسجيل النظام وإنشاء الاختصارات</span></div>
-          <div class="task-row" id="task-sync_apps"><span class="task-dot">5</span><span data-t="tSync">التشغيل التلقائي ومزامنة التطبيقات</span></div>
-          <div class="task-row" id="task-verify"><span class="task-dot">6</span><span data-t="tVerify">التحقق من السلامة والجاهزية</span></div>
-        </div>
+          <div class="tasks-grid">
+            <div class="task-row" id="task-stop_existing"><span class="task-dot">1</span><span data-t="tStop">Stop previous instances &amp; prepare folder</span></div>
+            <div class="task-row" id="task-extract_bin"><span class="task-dot">2</span><span data-t="tExtract">Deploy AuraBridge desktop binary &amp; icons</span></div>
+            <div class="task-row" id="task-migrate_data"><span class="task-dot">3</span><span data-t="tMigrate">Migrate .env &amp; telemetry history</span></div>
+            <div class="task-row" id="task-shortcuts"><span class="task-dot">4</span><span data-t="tShortcuts">Create shortcuts &amp; uninstaller registration</span></div>
+            <div class="task-row" id="task-sync_apps"><span class="task-dot">5</span><span data-t="tSync">Configure startup &amp; sync AI developer tools</span></div>
+            <div class="task-row" id="task-verify"><span class="task-dot">6</span><span data-t="tVerify">Verify installation integrity</span></div>
+          </div>
 
-        <div class="log-box" id="install-log">Initializing Aura Setup Wizard...</div>
+          <div class="log-box" id="install-log">Initializing AuraBridge Setup Wizard...</div>
+        </div>
       </section>
 
       <!-- STEP 4 -->
       <section class="pane" id="pane-4">
-        <div class="done-hero">
-          <div class="done-badge" id="done-icon">✓</div>
-          <h2 style="font-size:1.4rem;font-weight:800;" id="done-title" data-t="s4Title">اكتمل تثبيت Claude Switch Pro بنجاح!</h2>
-          <p style="font-size:0.86rem;color:var(--text-sec);line-height:1.6;" id="done-desc" data-t="s4Sub">
-            تم تثبيت التطبيق الموحد ومزامنة الإعدادات بنجاح. يمكنك الآن تشغيل لوحة التحكم الفورية فوراً.
-          </p>
-          <div class="pill mono" id="done-path" style="max-width:100%;overflow:hidden;text-overflow:ellipsis;">—</div>
-          <div style="display:flex;gap:10px;margin-top:8px;">
-            <button type="button" class="btn-primary" id="btn-launch-app" data-t="btnLaunch">تشغيل Claude Switch Pro الآن</button>
-            <button type="button" class="btn-ghost" id="btn-finish-only" data-t="btnFinish">إغلاق</button>
+        <div class="done-banner">
+          <div class="done-banner-left">
+            <div class="done-check-circle" id="done-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <h2 style="font-size:1.18rem;font-weight:800;" id="done-title" data-t="s4Title">AuraBridge Installed Successfully!</h2>
+              <p style="font-size:0.78rem;color:var(--text-sec);margin-top:2px;" id="done-desc" data-t="s4Sub">
+                Your native desktop control center and local Responses API bridge are verified and ready.
+              </p>
+            </div>
+          </div>
+          <span class="pill mono" id="done-path" style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">AuraBridge</span>
+        </div>
+
+        <div class="bento-done">
+          <article class="bento-card">
+            <div class="bento-head">
+              <span class="bento-title" data-t="b1Title">Local Rust Bridge Engine</span>
+              <span class="pill pill-ok mono">127.0.0.1:18787</span>
+            </div>
+            <p class="bento-desc" data-t="b1Desc">
+              Sub-100ms native Tauri shell + Axum HTTP/SSE gateway with Pre-Commit 429 Shield and zero blank startup screen.
+            </p>
+            <div class="chip-row">
+              <span class="pill mono">/v1/messages</span>
+              <span class="pill mono">/v1/responses</span>
+              <span class="pill mono">/health</span>
+            </div>
+          </article>
+
+          <article class="bento-card">
+            <div class="bento-head">
+              <span class="bento-title" data-t="b2Title">Synced AI Tools &amp; Capabilities</span>
+              <span class="pill pill-ok" data-t="b2Badge">Ready</span>
+            </div>
+            <p class="bento-desc" data-t="b2Desc">
+              Multimodal Vision, PDF &amp; Audio blocks enabled alongside xhigh reasoning and 230+ MCP tool sanitization.
+            </p>
+            <div class="chip-row">
+              <span class="pill">Claude Code CLI</span>
+              <span class="pill">Claude Desktop</span>
+              <span class="pill">DeepSeek Hermes</span>
+            </div>
+          </article>
+
+          <article class="bento-card">
+            <div class="bento-head">
+              <span class="bento-title" data-t="b3Title">Frontier Model Routing</span>
+              <span class="pill mono">3 Tiers Active</span>
+            </div>
+            <p class="bento-desc" data-t="b3Desc">
+              Automatic Opus / Sonnet / Haiku routing mapped seamlessly to frontier OpenAI Responses endpoints.
+            </p>
+            <div class="chip-row">
+              <span class="pill mono">gpt-6.1-sol</span>
+              <span class="pill mono">gpt-6-astra</span>
+              <span class="pill mono">gpt-5.6-sol</span>
+            </div>
+          </article>
+
+          <article class="bento-card partner-highlight">
+            <div class="bento-head">
+              <span class="bento-title" data-t="b4Title">AgentRouter Free API Credit</span>
+              <span class="pill" style="border-color:rgba(219,39,119,0.45);color:var(--accent);">$175 + $25/day</span>
+            </div>
+            <p class="bento-desc" data-t="b4Desc">
+              New AgentRouter accounts receive $175 welcome credit on signup plus $25 daily free usage for gpt-6.1-sol &amp; gpt-6-astra.
+            </p>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button type="button" class="btn-emerald" id="btn-agentrouter" style="padding:7px 12px;font-size:0.78rem;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                <span data-t="btnClaimCredit">Claim $175 Welcome Credit</span>
+              </button>
+            </div>
+          </article>
+        </div>
+
+        <div class="wizard-footer">
+          <button type="button" class="btn-ghost" id="btn-finish-only" data-t="btnFinish">Close</button>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <button type="button" class="btn-ghost" id="btn-open-repo">GitHub: Mstrq4/aura-bridge</button>
+            <button type="button" class="btn-primary" id="btn-launch-app">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span data-t="btnLaunch">Launch AuraBridge Studio Now</span>
+            </button>
           </div>
         </div>
       </section>
@@ -596,58 +884,8 @@
 
   <script>
     const I18N = {
-      ar: {
-        brandTitle: "معالج تثبيت Claude Switch Pro",
-        modeFresh: "تثبيت متكامل",
-        modeUpgrade: "ترقية ذكية للإصدار المثبت",
-        btnTheme: "داكن",
-        btnThemeLight: "فاتح",
-        st1: "الترحيب",
-        st2: "المسار والخيارات",
-        st3: "مراحل التثبيت",
-        st4: "الاكتمال والتشغيل",
-        heroTitle: "مركز تحكم وجسر نماذج AI الأصلي",
-        heroSub: "تطبيق سطح مكتب مدمج فوري الإقلاع مع جسر Rust مدمج عالي الأداء ومزامنة تلقائية لـ Claude Code CLI و DeepSeek Harness وتحديثات تلقائية من GitHub.",
-        f1Title: "إقلاع فوري بدون شاشة رمادية",
-        f1Desc: "نواة WebView2 مدمجة دون الاعتماد على متصفح خارجي أو Node.js",
-        f2Title: "محرك Responses + درع الحماية",
-        f2Desc: "دعم Vision و PDF وتفكير xhigh وحماية استباقية ضد 429",
-        f3Title: "مزامنة بنقرة واحدة",
-        f3Desc: "تهيئة فورية لـ Claude Code و DeepSeek Harness و Desktop",
-        f4Title: "تحديثات GitHub التلقائية",
-        f4Desc: "تنزيل وتثبيت الإصدارات الجديدة موقّعة رقمياً بضغطة واحدة",
-        licenseTag: "مفتوح المصدر — MIT License",
-        btnCancel: "إلغاء",
-        btnStart: "بدء الإعداد",
-        s2Title: "اختر مسار التثبيت والخيارات المتكاملة",
-        s2Sub: "سيتم نقل إعدادات .env وإحصائياتك السابقة تلقائياً دون أي فقد.",
-        lblInstallDir: "مجلد التثبيت",
-        btnBrowse: "استعراض...",
-        optDesktop: "اختصار سطح المكتب",
-        optDesktopDesc: "إضافة أيقونة Aura على سطح المكتب",
-        optStartMenu: "اختصار قائمة ابدأ",
-        optStartMenuDesc: "تثبيت التطبيق في قائمة ابدأ وإلغاء التثبيت",
-        optAutoStart: "التشغيل مع بدء النظام",
-        optAutoStartDesc: "إبقاء الجسر جاهزاً في شريط المهام عند تسجيل الدخول",
-        optSyncApps: "مزامنة الأدوات تلقائياً",
-        optSyncAppsDesc: "تحديث Claude Code و DeepSeek Harness فور التثبيت",
-        btnBack: "السابق",
-        btnInstallNow: "تثبيت الآن",
-        s3Title: "جاري تثبيت المكونات وتهيئة النظام...",
-        s3Sub: "يرجى الانتظار بضع ثوانٍ",
-        tStop: "إيقاف أي عملية سابقة وتحضير المسار",
-        tExtract: "نسخ التطبيق الموحد والأيقونات",
-        tMigrate: "ترحيل الإعدادات والبيانات السابقة",
-        tShortcuts: "تسجيل النظام وإنشاء الاختصارات",
-        tSync: "التشغيل التلقائي ومزامنة التطبيقات",
-        tVerify: "التحقق من السلامة والجاهزية",
-        s4Title: "اكتمل تثبيت Claude Switch Pro بنجاح!",
-        s4Sub: "تم تثبيت التطبيق الموحد ومزامنة الإعدادات بنجاح. يمكنك الآن تشغيل لوحة التحكم الفورية فوراً.",
-        btnLaunch: "تشغيل Claude Switch Pro الآن",
-        btnFinish: "إغلاق",
-      },
       en: {
-        brandTitle: "Claude Switch Pro Setup Wizard",
+        brandTitle: "AuraBridge Setup Wizard",
         modeFresh: "Full Installation",
         modeUpgrade: "Smart Upgrade",
         btnTheme: "Dark",
@@ -656,51 +894,125 @@
         st2: "Path & Options",
         st3: "Installing",
         st4: "Complete",
-        heroTitle: "Unified Native AI Bridge & Control Hub",
-        heroSub: "Instant WebView2 desktop app with embedded Rust Responses API engine, automatic sync for Claude Code & DeepSeek Harness, and signed GitHub auto-updates.",
-        f1Title: "Instant Native Startup",
-        f1Desc: "Zero grey screen, zero Node.js dependency, built-in WebView2 shell",
-        f2Title: "Responses Engine + Shield",
-        f2Desc: "Full Vision, PDF, xhigh reasoning, and pre-commit SSE rate-limit shield",
-        f3Title: "1-Click Tool Sync",
-        f3Desc: "Automatically configures Claude Code CLI, DeepSeek Harness & Desktop",
-        f4Title: "GitHub Auto-Updater",
-        f4Desc: "Signed cross-platform updates directly from GitHub Releases",
-        licenseTag: "Open Source — MIT License",
+        heroTitle: "Universal AI Agent Bridge & Control Center",
+        heroSub: "Instant native Tauri v2 desktop app with embedded Rust Responses API engine, automatic sync for Claude Code CLI & DeepSeek Hermes, and signed GitHub auto-updates.",
+        f1Title: "Instant Cold Boot (<100ms)",
+        f1Desc: "Zero blank grey screen, zero Node.js dependency, built-in native shell",
+        f2Title: "Responses Engine + 429 Shield",
+        f2Desc: "Vision, PDF, Audio, xhigh reasoning & 230+ MCP tool schema sanitizer",
+        f3Title: "1-Click Multi-Agent Sync",
+        f3Desc: "Configures Claude Code CLI, Claude Desktop & DeepSeek Hermes",
+        f4Title: "Signed Auto-Updates",
+        f4Desc: "Minisign-verified releases directly from GitHub Releases",
+        licenseTag: "Open Source · MIT License",
         btnCancel: "Cancel",
-        btnStart: "Get Started",
-        s2Title: "Installation Folder & Preferences",
-        s2Sub: "Existing .env keys and telemetry history are preserved automatically.",
+        btnStart: "Configure & Install",
+        s2Title: "Installation Folder & System Preferences",
+        s2Sub: "Customize install location, system integration, and automatic agent configuration.",
         lblInstallDir: "Install Directory",
         btnBrowse: "Browse...",
+        migNote: "Smart Preservation: Existing .env API keys, model presets, and telemetry.json history migrate automatically.",
         optDesktop: "Desktop Shortcut",
-        optDesktopDesc: "Create Claude Switch Pro icon on Desktop",
+        optDesktopDesc: "Create AuraBridge shortcut on Desktop",
         optStartMenu: "Start Menu & Registry",
-        optStartMenuDesc: "Register Start Menu shortcut & Add/Remove Programs entry",
+        optStartMenuDesc: "Register Start Menu & Add/Remove Programs",
         optAutoStart: "Launch at Startup",
-        optAutoStartDesc: "Keep the bridge ready in system tray on login",
+        optAutoStartDesc: "Keep local bridge active in System Tray",
         optSyncApps: "Auto-Sync AI Tools",
-        optSyncAppsDesc: "Sync Claude Code CLI & DeepSeek Harness after install",
+        optSyncAppsDesc: "Configure Claude Code, Desktop & Hermes",
         btnBack: "Back",
-        btnInstallNow: "Install Now",
-        s3Title: "Installing Components & Configuring Bridge...",
-        s3Sub: "This will finish in a few seconds",
-        tStop: "Stopping running instances & preparing target",
-        tExtract: "Deploying unified app & desktop icons",
-        tMigrate: "Migrating .env & telemetry state",
-        tShortcuts: "Registering shortcuts & uninstaller",
-        tSync: "Configuring startup & syncing tools",
-        tVerify: "Verifying installation integrity",
-        s4Title: "Claude Switch Pro Installed Successfully!",
-        s4Sub: "Your unified desktop app and local bridge engine are ready. Launch the control center anytime from Start Menu or Tray.",
-        btnLaunch: "Launch Claude Switch Pro Now",
+        btnInstallNow: "Install AuraBridge Now",
+        s3Title: "Installing AuraBridge & Configuring Agents...",
+        s3Sub: "Completing 6 automated verification stages",
+        tStop: "Stop previous instances & prepare folder",
+        tExtract: "Deploy AuraBridge desktop binary & icons",
+        tMigrate: "Migrate .env & telemetry history",
+        tShortcuts: "Create shortcuts & uninstaller registration",
+        tSync: "Configure startup & sync AI developer tools",
+        tVerify: "Verify installation integrity",
+        s4Title: "AuraBridge Installed Successfully!",
+        s4Sub: "Your native desktop control center and local Responses API bridge are verified and ready.",
+        b1Title: "Local Rust Bridge Engine",
+        b1Desc: "Sub-100ms native Tauri shell + Axum HTTP/SSE gateway with Pre-Commit 429 Shield and zero blank startup screen.",
+        b2Title: "Synced AI Tools & Capabilities",
+        b2Badge: "Ready",
+        b2Desc: "Multimodal Vision, PDF & Audio blocks enabled alongside xhigh reasoning and 230+ MCP tool sanitization.",
+        b3Title: "Frontier Model Routing",
+        b3Desc: "Automatic Opus / Sonnet / Haiku routing mapped seamlessly to frontier OpenAI Responses endpoints.",
+        b4Title: "AgentRouter Free API Credit",
+        b4Desc: "New AgentRouter accounts receive $175 welcome credit on signup plus $25 daily free usage for gpt-6.1-sol & gpt-6-astra.",
+        btnClaimCredit: "Claim $175 Welcome Credit",
+        btnLaunch: "Launch AuraBridge Studio Now",
         btnFinish: "Close",
+      },
+      ar: {
+        brandTitle: "معالج تثبيت AuraBridge",
+        modeFresh: "تثبيت متكامل",
+        modeUpgrade: "ترقية ذكية للإصدار المثبت",
+        btnTheme: "داكن",
+        btnThemeLight: "فاتح",
+        st1: "الترحيب",
+        st2: "المسار والخيارات",
+        st3: "مراحل التثبيت",
+        st4: "الاكتمال والتشغيل",
+        heroTitle: "جسر وكلاء الذكاء الاصطناعي ومركز التحكم الشامل",
+        heroSub: "تطبيق سطح مكتب أصلي بـ Tauri v2 وجسر Rust مدمج عالي الأداء ومزامنة تلقائية لـ Claude Code CLI و DeepSeek Harness مع تحديثات GitHub التلقائية.",
+        f1Title: "إقلاع فوري أقل من 100ms",
+        f1Desc: "بدون شاشة رمادية فارغة وبدون الحاجة لـ Node.js أو متصفح خارجي",
+        f2Title: "محرك Responses + درع 429",
+        f2Desc: "دعم الصور و PDF والصوت وتفكير xhigh وتعقيم +230 أداة MCP",
+        f3Title: "مزامنة الوكلاء بنقرة واحدة",
+        f3Desc: "تهيئة Claude Code CLI و Claude Desktop و DeepSeek Hermes تلقائياً",
+        f4Title: "تحديثات موقّعة رقمياً",
+        f4Desc: "تنزيل وتثبيت التحديثات الموقّعة مباشرة من GitHub Releases",
+        licenseTag: "مفتوح المصدر · رخصة MIT",
+        btnCancel: "إلغاء",
+        btnStart: "الإعداد والتثبيت",
+        s2Title: "مسار التثبيت وتفضيلات النظام",
+        s2Sub: "اختر مجلد التثبيت وتكامل النظام والمزامنة التلقائية للتطبيقات.",
+        lblInstallDir: "مجلد التثبيت",
+        btnBrowse: "استعراض...",
+        migNote: "ترحيل ذكي: يتم نقل مفاتيح .env وإعدادات النماذج وسجل telemetry.json تلقائياً دون فقد.",
+        optDesktop: "اختصار سطح المكتب",
+        optDesktopDesc: "إنشاء أيقونة AuraBridge على سطح المكتب",
+        optStartMenu: "قائمة ابدأ وسجل النظام",
+        optStartMenuDesc: "التسجيل في قائمة ابدأ وبرامج الإزالة",
+        optAutoStart: "التشغيل مع النظام",
+        optAutoStartDesc: "إبقاء الجسر جاهزاً في شريط المهام عند الإقلاع",
+        optSyncApps: "مزامنة أدوات التطوير",
+        optSyncAppsDesc: "ضبط Claude Code و Desktop و Hermes فوراً",
+        btnBack: "السابق",
+        btnInstallNow: "تثبيت AuraBridge الآن",
+        s3Title: "جاري تثبيت AuraBridge وتهيئة الوكلاء...",
+        s3Sub: "تنفيذ 6 مراحل تثبيت وتحقق متسلسلة",
+        tStop: "إيقاف النسخ السابقة وتحضير المسار",
+        tExtract: "نسخ التطبيق الموحد والأيقونات",
+        tMigrate: "ترحيل الإعدادات وسجل البيانات",
+        tShortcuts: "تسجيل النظام وإنشاء الاختصارات",
+        tSync: "ضبط الإقلاع التلقائي ومزامنة الأدوات",
+        tVerify: "التحقق من سلامة وجاهزية التثبيت",
+        s4Title: "تم تثبيت AuraBridge بنجاح!",
+        s4Sub: "مركز التحكم وجسر Responses المحلي مثبتان وجاهزان للعمل الفوري.",
+        b1Title: "محرك الجسر المحلي Rust",
+        b1Desc: "إقلاع فوري بـ Tauri مع بوابة HTTP/SSE ودرع حماية 429 قبل بدء البث.",
+        b2Title: "الأدوات المزمنة والقدرات",
+        b2Badge: "جاهز",
+        b2Desc: "تفعيل الصور و PDF والصوت والتفكير حتى xhigh وتقنين +230 أداة MCP.",
+        b3Title: "توجيه النماذج المتقدمة",
+        b3Desc: "ربط تلقائي لفئات Opus و Sonnet و Haiku عبر بوابة /v1/responses.",
+        b4Title: "رصيد AgentRouter السحابي المجاني",
+        b4Desc: "تمنحك المنصة $175 رصيداً ترحيبياً فور التسجيل بالإضافة إلى $25 رصيداً مجانياً يومياً.",
+        btnClaimCredit: "احصل على $175 رصيداً مجانياً",
+        btnLaunch: "تشغيل AuraBridge الآن",
+        btnFinish: "إغلاق",
       }
     };
 
-    let lang = "ar";
+    let lang = "en";
     let theme = "light";
     let isUpgrade = false;
+    let installStartMs = 0;
+    let installTimer = null;
 
     function sendIpc(payload) {
       try {
@@ -709,7 +1021,7 @@
     }
 
     function applyLang(nextLang) {
-      lang = nextLang === "en" ? "en" : "ar";
+      lang = nextLang === "ar" ? "ar" : "en";
       document.documentElement.setAttribute("lang", lang);
       document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
       document.getElementById("btn-wiz-lang").textContent = lang === "ar" ? "English" : "العربية";
@@ -754,8 +1066,9 @@
 
     window.__INSTALLER_STEP__ = ({ stepId, status, progress, logLine }) => {
       if (typeof progress === "number") {
-        document.getElementById("prog-bar").style.width = `${Math.min(100, Math.max(0, progress))}%`;
-        document.getElementById("prog-pct").textContent = `${Math.min(100, Math.max(0, progress))}%`;
+        const pct = Math.min(100, Math.max(0, progress));
+        document.getElementById("prog-bar").style.width = `${pct}%`;
+        document.getElementById("prog-pct").textContent = `${pct}%`;
       }
       if (stepId) {
         const row = document.getElementById(`task-${stepId}`);
@@ -777,12 +1090,13 @@
     };
 
     window.__INSTALLER_DONE__ = ({ ok, installedPath, error }) => {
+      if (installTimer) {
+        clearInterval(installTimer);
+        installTimer = null;
+      }
       const donePath = document.getElementById("done-path");
       if (donePath) donePath.textContent = installedPath || "";
       if (!ok) {
-        document.getElementById("done-icon").textContent = "!";
-        document.getElementById("done-icon").style.borderColor = "var(--err)";
-        document.getElementById("done-icon").style.color = "var(--err)";
         document.getElementById("done-title").textContent = lang === "ar" ? "تعذر إكمال التثبيت" : "Installation Failed";
         document.getElementById("done-desc").textContent = error || "Unknown error";
         document.getElementById("btn-launch-app").style.display = "none";
@@ -790,7 +1104,7 @@
       goStep(4);
     };
 
-    document.getElementById("btn-wiz-lang").addEventListener("click", () => applyLang(lang === "ar" ? "en" : "ar"));
+    document.getElementById("btn-wiz-lang").addEventListener("click", () => applyLang(lang === "en" ? "ar" : "en"));
     document.getElementById("btn-wiz-theme").addEventListener("click", () => applyTheme(theme === "dark" ? "light" : "dark"));
     document.getElementById("btn-cancel-1").addEventListener("click", () => sendIpc({ cmd: "close" }));
     document.getElementById("btn-next-1").addEventListener("click", () => goStep(2));
@@ -802,6 +1116,12 @@
     document.getElementById("btn-install-now").addEventListener("click", () => {
       goStep(3);
       document.getElementById("install-log").innerHTML = "";
+      installStartMs = Date.now();
+      if (installTimer) clearInterval(installTimer);
+      installTimer = setInterval(() => {
+        const sec = ((Date.now() - installStartMs) / 1000).toFixed(1);
+        document.getElementById("prog-timer").textContent = `${sec}s`;
+      }, 100);
       sendIpc({
         cmd: "start_install",
         installDir: document.getElementById("install-dir").value.trim(),
@@ -815,11 +1135,18 @@
       cmd: "launch_and_close",
       installDir: document.getElementById("install-dir").value.trim()
     }));
+    document.getElementById("btn-agentrouter").addEventListener("click", () => sendIpc({
+      cmd: "open_url",
+      url: "https://agentrouter.org/register?aff=lohG"
+    }));
+    document.getElementById("btn-open-repo").addEventListener("click", () => sendIpc({
+      cmd: "open_url",
+      url: "https://github.com/Mstrq4/aura-bridge"
+    }));
     document.getElementById("btn-finish-only").addEventListener("click", () => sendIpc({ cmd: "close" }));
 
-    applyLang("ar");
+    applyLang("en");
     sendIpc({ cmd: "ready" });
   </script>
 </body>
 </html>
-

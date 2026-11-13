@@ -11,8 +11,9 @@ let latestUpdateInfo = null;
 
 const TRANSLATIONS = {
   ar: {
-    appTitle: "Claude Switch Pro",
-    appSubtitle: "مركز تحكم Aura وجسر النماذج",
+    appTitle: "AuraBridge",
+    appSubtitle: "مركز تحكم AuraBridge وجسر النماذج",
+    btnPartnerCredit: "$175 رصيد مجاني + $25 يومياً",
     online: "متصل على 18787",
     offline: "غير متصل",
     themeDark: "داكن",
@@ -157,8 +158,9 @@ const TRANSLATIONS = {
     updateInstalling: "جاري تنزيل التحديث وتثبيته...",
   },
   en: {
-    appTitle: "Claude Switch Pro",
-    appSubtitle: "Aura Bridge Control Center",
+    appTitle: "AuraBridge",
+    appSubtitle: "Universal AI Responses Control Center",
+    btnPartnerCredit: "$175 Free Credit + $25/Day",
     online: "Online on 18787",
     offline: "Offline",
     themeDark: "Dark",

@@ -86,7 +86,7 @@ pub fn user_home_dir() -> PathBuf {
     }
 }
 
-pub fn app_data_dir() -> PathBuf {
+pub fn legacy_app_data_dir() -> PathBuf {
     #[cfg(windows)]
     {
         std::env::var_os("LOCALAPPDATA")
@@ -107,6 +107,30 @@ pub fn app_data_dir() -> PathBuf {
             .map(PathBuf::from)
             .unwrap_or_else(|| user_home_dir().join(".local").join("share"))
             .join("ClaudeSwitchPro")
+    }
+}
+
+pub fn app_data_dir() -> PathBuf {
+    #[cfg(windows)]
+    {
+        std::env::var_os("LOCALAPPDATA")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| user_home_dir().join("AppData").join("Local"))
+            .join("AuraBridge")
+    }
+    #[cfg(target_os = "macos")]
+    {
+        user_home_dir()
+            .join("Library")
+            .join("Application Support")
+            .join("AuraBridge")
+    }
+    #[cfg(all(not(windows), not(target_os = "macos")))]
+    {
+        std::env::var_os("XDG_DATA_HOME")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| user_home_dir().join(".local").join("share"))
+            .join("AuraBridge")
     }
 }
 
@@ -170,10 +194,12 @@ pub fn maybe_migrate_legacy_env() {
         return;
     }
     let _ = fs::create_dir_all(app_data_dir());
-    // Migrate seamlessly from previous install dir or legacy standalone Node bridge if present
-    let mut candidates = Vec::new();
+    // Migrate seamlessly from previous ClaudeSwitchPro profile, install dir, or legacy Node bridge
+    let mut candidates = vec![legacy_app_data_dir().join(".env")];
     if let Some(local) = std::env::var_os("LOCALAPPDATA") {
-        candidates.push(PathBuf::from(local).join("Programs").join("ClaudeSwitchPro").join(".env"));
+        let l = PathBuf::from(local);
+        candidates.push(l.join("Programs").join("AuraBridge").join(".env"));
+        candidates.push(l.join("Programs").join("ClaudeSwitchPro").join(".env"));
     }
     candidates.push(PathBuf::from(r"H:\Projects\Backend-API\Active\claude-responses-bridge\.env"));
     for legacy in candidates {
