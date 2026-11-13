@@ -4,7 +4,7 @@ version = "2.1.0"
 description = "Unified Aura Desktop Control Center & Embedded Responses Bridge"
 authors = ["Mstrq4"]
 license = "MIT"
-repository = "https://github.com/Mstrq4/claude-switch-pro"
+repository = "https://github.com/Mstrq4/aura-bridge"
 edition = "2021"
 
 [lib]

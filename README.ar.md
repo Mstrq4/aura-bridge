@@ -6,7 +6,7 @@
 
 **جسر بروتوكول `/v1/responses` الشامل لوكلاء الذكاء الاصطناعي ومركز التحكم ومعالج التثبيت**
 
-[English (الأصل)](README.md) · [العربية](README.ar.md) · [الموقع الرسمي](https://mstrq4.github.io/aura-bridge-web/) · [التنزيلات](https://github.com/Mstrq4/aura-bridge/releases/latest) · [خارطة الطريق](ROADMAP.md)
+[English (الأصل)](README.md) · [العربية](README.ar.md) · [التنزيلات](https://github.com/Mstrq4/aura-bridge/releases/latest) · [خارطة الطريق](ROADMAP.md) · [المساهمة](CONTRIBUTING.md)
 
 [![CI Multi-OS](https://github.com/Mstrq4/aura-bridge/actions/workflows/ci.yml/badge.svg)](https://github.com/Mstrq4/aura-bridge/actions/workflows/ci.yml)
 [![Release Multi-Arch](https://github.com/Mstrq4/aura-bridge/actions/workflows/release.yml/badge.svg)](https://github.com/Mstrq4/aura-bridge/actions/workflows/release.yml)
@@ -18,6 +18,8 @@
 للحصول على وصول فوري إلى النماذج المتقدمة (`gpt-6.1-sol`، `gpt-6-astra`، `gpt-5.6-sol`) عبر `/v1/responses`:
 
 [**سجّل في AgentRouter الآن — واحصل على $175 رصيداً مجانياً عند التسجيل + $25 رصيداً مجانياً كل يوم**](https://agentrouter.org/register?aff=lohG)
+
+> **شرط مهم لضمان استلام الرصيد**: يجب أن يكون عمر حساب **GitHub** المستخدم في التسجيل على منصة AgentRouter **أكثر من أسبوعين (14 يوماً على الأقل)** لضمان تفعيل الرصيد الترحيبي ($175) والرصيد اليومي ($25).
 
 </div>
 
@@ -31,10 +33,13 @@
 | :--- | :--- | :--- | :--- |
 | **ويندوز (Windows)** | `x86_64` (64-بت) | معالج التثبيت البصري Aura (4 مراحل) | [**تحميل `AuraBridge-Setup-windows-x86_64.exe`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge-Setup-windows-x86_64.exe) |
 | **ويندوز (Windows)** | `x86_64` (64-بت) | نسخة محمولة بدون تثبيت | [**تحميل `AuraBridge-windows-x86_64-portable.exe`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge-windows-x86_64-portable.exe) |
-| **ويندوز (Windows)** | `aarch64` (ARM64) | معالج التثبيت البصري ARM64 | [**تحميل `AuraBridge-Setup-windows-arm64.exe`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge-Setup-windows-arm64.exe) |
-| **ماك (macOS)** | معالجات Apple Silicon (`M1/M2/M3/M4`) | حزمة `.dmg` موقّعة | [**تنزيل نسخة `aarch64` من GitHub Releases**](https://github.com/Mstrq4/aura-bridge/releases/latest) |
-| **ماك (macOS)** | معالجات Intel (`x86_64`) | حزمة `.dmg` موقّعة | [**تنزيل نسخة `x64` من GitHub Releases**](https://github.com/Mstrq4/aura-bridge/releases/latest) |
-| **ماك (macOS)** | الحزمة الشاملة (`Universal`) | ملف `.dmg` موحّد | [**تنزيل النسخة الشاملة من GitHub Releases**](https://github.com/Mstrq4/aura-bridge/releases/latest) |
+| **ويندوز (Windows)** | `x86` (`i686` 32-بت) | معالج التثبيت البصري (32-بت) | [**تحميل `AuraBridge-Setup-windows-x86.exe`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge-Setup-windows-x86.exe) |
+| **ويندوز (Windows)** | `ARM64` (`aarch64`) | معالج التثبيت البصري ARM64 | [**تحميل `AuraBridge-Setup-windows-arm64.exe`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge-Setup-windows-arm64.exe) |
+| **ماك (macOS)** | Apple Silicon (`M1–M4`) | حزمة `.dmg` موقّعة | [**تحميل `AuraBridge_2.1.0_aarch64.dmg`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge_2.1.0_aarch64.dmg) |
+| **ماك (macOS)** | Intel (`x86_64`) | حزمة `.dmg` موقّعة | [**تحميل `AuraBridge_2.1.0_x64.dmg`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge_2.1.0_x64.dmg) |
+| **ماك (macOS)** | الحزمة الشاملة (`Universal`) | ملف `.dmg` موحّد (Silicon + Intel) | [**تحميل `AuraBridge_2.1.0_universal.dmg`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge_2.1.0_universal.dmg) |
+| **لينكس (Linux)** | `x86_64` (`amd64`) | `.AppImage` / `.deb` / `.rpm` / محمول | [**تنزيل Linux x64 من GitHub Releases**](https://github.com/Mstrq4/aura-bridge/releases/latest) |
+| **لينكس (Linux)** | `ARM64` (`aarch64`) | `.AppImage` / `.deb` / `.rpm` / محمول | [**تنزيل Linux ARM64 من GitHub Releases**](https://github.com/Mstrq4/aura-bridge/releases/latest) |
 
 > لدعم التثبيت الصامت الآلي في بيئات العمل:
 > ```powershell

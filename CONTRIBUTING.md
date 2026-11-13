@@ -12,15 +12,14 @@ Thank you for helping make **AuraBridge** faster, cleaner, and compatible across
 | `ui/` | Embedded Aura Control Center & Setup Wizard HTML/CSS/JS (zero external render-blocking assets) | Vanilla ESM + Spatial Aura CSS |
 | `docs/assets/` | Scalable SVG brand & architecture diagrams | SVG |
 
-> The official Next.js web portal lives in its own dedicated repository: [`Mstrq4/aura-bridge-web`](https://github.com/Mstrq4/aura-bridge-web) ([Live Site](https://mstrq4.github.io/aura-bridge-web/)).
-
 ## Local Development Workflow
 
 ### 1. Prerequisites
 - **Rust stable** (`rustup toolchain install stable`) with `clippy`
-- **Node.js >= 22** & **pnpm >= 10** (`napp` CLI installed on Windows)
+- **Node.js >= 22**
 - On Windows: Microsoft Edge WebView2 Runtime & LLVM (`llvm-rc`) or Windows SDK (`rc.exe`)
 - On macOS: Xcode Command Line Tools (`xcode-select --install`)
+- On Linux: `libwebkit2gtk-4.1-dev`, `libayatana-appindicator3-dev`, `librsvg2-dev`, `patchelf`
 
 ### 2. Running Tests & Quality Gates
 
@@ -31,14 +30,12 @@ cargo check --workspace --all-targets
 cargo clippy --workspace --all-targets
 ```
 
-For web portal contributions in the sibling [`aura-bridge-web`](https://github.com/Mstrq4/aura-bridge-web) repository, run `napp check`.
-
 ## Coding & Contribution Rules
 
-1. **Zero Secrets in Commits**: Never commit `.env`, `*.key`, `telemetry.json`, personal config backups, tokens (`sk-...`), or compiled `*.exe` / `*.dmg` binaries.
+1. **Zero Secrets in Commits**: Never commit `.env`, `*.key`, `telemetry.json`, personal config backups, tokens (`sk-...`), or compiled binaries.
 2. **Preserve External Reference Safety**: Follow `AGENTS.md` strictly regarding isolated projects.
-3. **Bilingual & RTL-First UI**: New UI controls in both `ui/` and `aura-bridge-web` must define both English (`en`, LTR) and Arabic (`ar`, RTL) translations using logical CSS (`ps-*`, `pe-*`, `text-start`).
-4. **Tests First**: Include focused unit tests in `crates/bridge-core` for protocol translation changes, schema sanitization, or bridge regressions.
+3. **Bilingual & RTL-First UI**: New UI controls in `ui/` must define both English (`en`, LTR) and Arabic (`ar`, RTL) translations using logical CSS (`ps-*`, `pe-*`, `text-start`).
+4. **Tests First**: Include focused unit tests in `crates/bridge-core` for protocol translation changes or schema sanitization fixes.
 
 ## Submitting a Pull Request
 

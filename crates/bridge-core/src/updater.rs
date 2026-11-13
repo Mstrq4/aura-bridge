@@ -147,7 +147,10 @@ pub async fn check_github_updates(current_version: &str, repo: Option<&str>) -> 
                                 && name.ends_with(".exe")
                                 && ((cfg!(target_arch = "aarch64") && name.contains("arm64"))
                                     || (cfg!(target_arch = "x86_64")
-                                        && (name.contains("x64") || name.contains("x86_64"))))
+                                        && (name.contains("x64") || name.contains("x86_64")))
+                                    || (cfg!(target_arch = "x86")
+                                        && (name.contains("x86") || name.contains("i686"))
+                                        && !name.contains("x86_64")))
                             {
                                 Some(url.to_string())
                             } else if cfg!(target_os = "macos")
@@ -155,6 +158,14 @@ pub async fn check_github_updates(current_version: &str, repo: Option<&str>) -> 
                                 && (name.contains("universal")
                                     || (cfg!(target_arch = "aarch64") && name.contains("aarch64"))
                                     || (cfg!(target_arch = "x86_64") && name.contains("x64")))
+                            {
+                                Some(url.to_string())
+                            } else if cfg!(target_os = "linux")
+                                && (name.ends_with(".appimage") || name.ends_with(".deb"))
+                                && ((cfg!(target_arch = "aarch64")
+                                    && (name.contains("arm64") || name.contains("aarch64")))
+                                    || (cfg!(target_arch = "x86_64")
+                                        && (name.contains("amd64") || name.contains("x86_64") || name.contains("x64"))))
                             {
                                 Some(url.to_string())
                             } else {

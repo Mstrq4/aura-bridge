@@ -6,7 +6,7 @@
 
 **Universal AI Agent `/v1/responses` Bridge, Control Center & Setup Wizard**
 
-[English](README.md) · [العربية](README.ar.md) · [Live Website](https://mstrq4.github.io/aura-bridge-web/) · [Releases](https://github.com/Mstrq4/aura-bridge/releases/latest) · [Roadmap](ROADMAP.md)
+[English](README.md) · [العربية](README.ar.md) · [Releases](https://github.com/Mstrq4/aura-bridge/releases/latest) · [Roadmap](ROADMAP.md) · [Contribute](CONTRIBUTING.md)
 
 [![CI Multi-OS](https://github.com/Mstrq4/aura-bridge/actions/workflows/ci.yml/badge.svg)](https://github.com/Mstrq4/aura-bridge/actions/workflows/ci.yml)
 [![Release Multi-Arch](https://github.com/Mstrq4/aura-bridge/actions/workflows/release.yml/badge.svg)](https://github.com/Mstrq4/aura-bridge/actions/workflows/release.yml)
@@ -19,22 +19,27 @@ Need ready-to-use frontier endpoints (`gpt-6.1-sol`, `gpt-6-astra`, `gpt-5.6-sol
 
 [**Register on AgentRouter — Receive $175 Welcome Credit + $25 Daily Free Credit**](https://agentrouter.org/register?aff=lohG)
 
+> **Eligibility Note**: Your **GitHub account used to sign in on AgentRouter must be older than 2 weeks (14+ days)** to guarantee unlocking the **$175 signup balance + $25 daily credit**.
+
 </div>
 
 ---
 
 ## Direct Multi-Architecture Downloads
 
-Download the latest signed desktop installers and portable builds directly from GitHub Releases (`v2.1.0`):
+Download the latest signed desktop installers, packages, and portable builds directly from [GitHub Releases](https://github.com/Mstrq4/aura-bridge/releases/latest):
 
 | Platform | Architecture | Package | Download |
 | :--- | :--- | :--- | :--- |
-| **Windows** | `x86_64` (64-bit) | Visual 4-Step Aura Setup Wizard | [**Download `AuraBridge-Setup-windows-x86_64.exe`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge-Setup-windows-x86_64.exe) |
-| **Windows** | `x86_64` (64-bit) | Portable Desktop App | [**Download `AuraBridge-windows-x86_64-portable.exe`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge-windows-x86_64-portable.exe) |
-| **Windows** | `aarch64` (ARM64) | Visual Setup Wizard (ARM64) | [**Download `AuraBridge-Setup-windows-arm64.exe`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge-Setup-windows-arm64.exe) |
-| **macOS** | Apple Silicon (`M1/M2/M3/M4`) | Signed `.dmg` Bundle | [**Download via GitHub Releases (`aarch64`)**](https://github.com/Mstrq4/aura-bridge/releases/latest) |
-| **macOS** | Intel (`x86_64`) | Signed `.dmg` Bundle | [**Download via GitHub Releases (`x64`)**](https://github.com/Mstrq4/aura-bridge/releases/latest) |
-| **macOS** | Universal (`Apple Silicon + Intel`) | Signed Universal `.dmg` | [**Download via GitHub Releases (`universal`)**](https://github.com/Mstrq4/aura-bridge/releases/latest) |
+| **Windows** | `x86_64` (64-bit) | Visual 4-Step Setup Wizard | [**Download `AuraBridge-Setup-windows-x86_64.exe`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge-Setup-windows-x86_64.exe) |
+| **Windows** | `x86_64` (64-bit) | Portable Executable | [**Download `AuraBridge-windows-x86_64-portable.exe`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge-windows-x86_64-portable.exe) |
+| **Windows** | `x86` (`i686` 32-bit) | Visual Setup Wizard & Portable | [**Download `AuraBridge-Setup-windows-x86.exe`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge-Setup-windows-x86.exe) |
+| **Windows** | `ARM64` (`aarch64`) | Visual Setup Wizard (ARM64) | [**Download `AuraBridge-Setup-windows-arm64.exe`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge-Setup-windows-arm64.exe) |
+| **macOS** | Apple Silicon (`M1–M4` / `aarch64`) | Signed `.dmg` Bundle | [**Download `AuraBridge_2.1.0_aarch64.dmg`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge_2.1.0_aarch64.dmg) |
+| **macOS** | Intel (`x86_64`) | Signed `.dmg` Bundle | [**Download `AuraBridge_2.1.0_x64.dmg`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge_2.1.0_x64.dmg) |
+| **macOS** | Universal (`Silicon + Intel`) | Signed Universal `.dmg` | [**Download `AuraBridge_2.1.0_universal.dmg`**](https://github.com/Mstrq4/aura-bridge/releases/latest/download/AuraBridge_2.1.0_universal.dmg) |
+| **Linux** | `x86_64` (`amd64`) | `.AppImage` / `.deb` / `.rpm` / Portable | [**Download Linux x64 via Releases**](https://github.com/Mstrq4/aura-bridge/releases/latest) |
+| **Linux** | `ARM64` (`aarch64`) | `.AppImage` / `.deb` / `.rpm` / Portable | [**Download Linux ARM64 via Releases**](https://github.com/Mstrq4/aura-bridge/releases/latest) |
 
 > Silent automated Windows installation is also built in:
 > ```powershell
@@ -178,9 +183,8 @@ npx tauri build --no-bundle
 $env:CSP_PAYLOAD_PATH = (Resolve-Path ".\target\release\claude-switch-pro.exe").Path
 cargo build --release -p claude-switch-pro-setup
 
-# 4. Separate Web Portal Repository (powered by napp)
-# Cloned at H:\Projects\Web\Active\aura-bridge-web -> https://github.com/Mstrq4/aura-bridge-web
-napp check
+# 4. Run full Rust check
+cargo clippy --workspace --all-targets
 ```
 
 See [**ROADMAP.md**](ROADMAP.md) for our phased engineering plan and [**CONTRIBUTING.md**](CONTRIBUTING.md) to contribute pull requests!

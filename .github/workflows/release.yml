@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   publish-tauri:
-    name: Build & Sign (${{ matrix.platform }} / ${{ matrix.target }})
+    name: Build & Sign (${{ matrix.arch_label }})
     strategy:
       fail-fast: false
       matrix:
@@ -20,32 +20,72 @@ jobs:
             target: x86_64-pc-windows-msvc
             arch_label: windows-x86_64
             is_windows: true
+            is_linux: false
+            mac_targets: ""
+          - platform: windows-latest
+            target: i686-pc-windows-msvc
+            arch_label: windows-x86
+            is_windows: true
+            is_linux: false
             mac_targets: ""
           - platform: windows-latest
             target: aarch64-pc-windows-msvc
             arch_label: windows-arm64
             is_windows: true
+            is_linux: false
             mac_targets: ""
           - platform: macos-latest
             target: aarch64-apple-darwin
             arch_label: macos-aarch64
             is_windows: false
+            is_linux: false
             mac_targets: ""
           - platform: macos-latest
             target: x86_64-apple-darwin
             arch_label: macos-x86_64
             is_windows: false
+            is_linux: false
             mac_targets: ""
           - platform: macos-latest
             target: universal-apple-darwin
             arch_label: macos-universal
             is_windows: false
+            is_linux: false
             mac_targets: "x86_64-apple-darwin aarch64-apple-darwin"
+          - platform: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            arch_label: linux-x86_64
+            is_windows: false
+            is_linux: true
+            mac_targets: ""
+          - platform: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            arch_label: linux-arm64
+            is_windows: false
+            is_linux: true
+            mac_targets: ""
 
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Install Linux Tauri System Dependencies
+        if: ${{ matrix.is_linux }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            rpm
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -76,9 +116,10 @@ jobs:
           releaseBody: |
             ### AuraBridge ${{ github.ref_name }}
             - Unified Tauri v2 + Embedded Rust `/v1/responses` Bridge Engine (Instant `<100ms` Native Launch, Zero Node.js)
-            - AuraBridge 4-Step Visual Setup Wizard (`AuraBridge-Setup-*.exe`) & macOS Apple Silicon / Intel / Universal `.dmg`
-            - Signed Auto-Updater (`latest.json`) across Windows & macOS
-            - Official Website & Docs: https://mstrq4.github.io/aura-bridge-web/
+            - Windows (`x64`, `x86` 32-bit, `ARM64`) 4-Step Visual Setup Wizard & Portable Executables
+            - macOS (`Apple Silicon`, `Intel`, `Universal`) Signed `.dmg` Bundles
+            - Linux (`x86_64`, `ARM64`) `.AppImage`, `.deb`, `.rpm` & Portable Binaries
+            - Signed Auto-Updater (`latest.json`) across Windows, macOS & Linux
           releaseDraft: false
           prerelease: false
           args: --target ${{ matrix.target }}
@@ -109,3 +150,22 @@ jobs:
             dist-setup/AuraBridge-${{ matrix.arch_label }}-portable.exe
             dist-setup/ClaudeSwitchPro-Setup-${{ matrix.arch_label }}.exe
 
+      - name: Prepare Portable Linux Binary
+        if: ${{ matrix.is_linux }}
+        shell: bash
+        run: |
+          BIN="target/${{ matrix.target }}/release/claude-switch-pro"
+          if [ ! -f "$BIN" ]; then BIN="target/release/claude-switch-pro"; fi
+          mkdir -p dist-linux
+          cp "$BIN" "dist-linux/AuraBridge-${{ matrix.arch_label }}-portable"
+          chmod +x "dist-linux/AuraBridge-${{ matrix.arch_label }}-portable"
+
+      - name: Upload Portable Linux Binary to Release
+        if: ${{ matrix.is_linux && startsWith(github.ref, 'refs/tags/v') }}
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: |
+            dist-linux/AuraBridge-${{ matrix.arch_label }}-portable
