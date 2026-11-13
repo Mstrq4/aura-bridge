@@ -140,15 +140,16 @@ jobs:
 
       - name: Upload AuraBridge Installers to Release (Windows)
         if: ${{ matrix.is_windows && startsWith(github.ref, 'refs/tags/v') }}
-        uses: softprops/action-gh-release@v2
+        shell: pwsh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          files: |
-            dist-setup/AuraBridge-Setup-${{ matrix.arch_label }}.exe
-            dist-setup/AuraBridge-${{ matrix.arch_label }}-portable.exe
-            dist-setup/ClaudeSwitchPro-Setup-${{ matrix.arch_label }}.exe
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $files = @(
+            "dist-setup/AuraBridge-Setup-${{ matrix.arch_label }}.exe",
+            "dist-setup/AuraBridge-${{ matrix.arch_label }}-portable.exe",
+            "dist-setup/ClaudeSwitchPro-Setup-${{ matrix.arch_label }}.exe"
+          )
+          gh release upload "${{ github.ref_name }}" @files --repo "${{ github.repository }}" --clobber
 
       - name: Prepare Portable Linux Binary
         if: ${{ matrix.is_linux }}
@@ -162,10 +163,8 @@ jobs:
 
       - name: Upload Portable Linux Binary to Release
         if: ${{ matrix.is_linux && startsWith(github.ref, 'refs/tags/v') }}
-        uses: softprops/action-gh-release@v2
+        shell: bash
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref_name }}
-          files: |
-            dist-linux/AuraBridge-${{ matrix.arch_label }}-portable
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ github.ref_name }}" "dist-linux/AuraBridge-${{ matrix.arch_label }}-portable" --repo "${{ github.repository }}" --clobber
