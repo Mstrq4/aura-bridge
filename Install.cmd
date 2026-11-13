@@ -1,9 +1,9 @@
 @echo off
-chcp 65001 >nul
-title تثبيت Claude Switch Pro
-echo =========================================================
-echo  تثبيت Claude Switch Pro — بديل CC Switch المتكامل
-echo =========================================================
-echo.
-"%~dp0ClaudeSwitchPro-Setup.exe"
-echo اكتمل تشغيل برنامج التثبيت.
+setlocal
+cd /d "%~dp0"
+if not exist "ClaudeSwitchPro-Setup.exe" (
+  echo ClaudeSwitchPro-Setup.exe not found in current directory.
+  pause
+  exit /b 1
+)
+start "" "%~dp0ClaudeSwitchPro-Setup.exe" %*

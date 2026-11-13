@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Claude Switch Pro — Aura Bridge Control Center</title>
+  <script>
+    try {
+      var t = localStorage.getItem("crb_theme") === "dark" ? "dark" : "light";
+      var l = localStorage.getItem("crb_lang") === "en" ? "en" : "ar";
+      document.documentElement.setAttribute("data-theme", t);
+      document.documentElement.setAttribute("lang", l);
+      document.documentElement.setAttribute("dir", l === "ar" ? "rtl" : "ltr");
+    } catch (e) {}
+  </script>
+  <style>
+    html, body { margin: 0; padding: 0; background: #faf7f5; color: #0f172a; }
+    html[data-theme="dark"], html[data-theme="dark"] body { background: #090a12; color: #f8fafc; }
+  </style>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="spatial-frame">
+    <div class="spatial-shell">
+      <!-- Desktop Sidebar Rail -->
+      <aside class="sidebar-rail" aria-label="التنقل الرئيسي">
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div class="brand-lockup">
+            <div class="brand-mini-orb" data-icon="sparkles" aria-hidden="true"></div>
+            <div class="brand-titles">
+              <div class="brand-title" data-t="appTitle">Claude Switch Pro</div>
+              <div class="brand-subtitle" data-t="appSubtitle">مركز تحكم Aura وجسر النماذج</div>
+            </div>
+          </div>
+
+          <nav class="rail-nav" aria-label="الأقسام">
+            <button type="button" class="rail-btn active" data-tab="tab-usage">
+              <span data-icon="activity"></span>
+              <span data-t="tabUsage">المؤشرات العامة</span>
+            </button>
+            <button type="button" class="rail-btn" data-tab="tab-agents">
+              <span data-icon="bot"></span>
+              <span data-t="tabAgents">إحصائيات الوكلاء</span>
+            </button>
+            <button type="button" class="rail-btn" data-tab="tab-logs">
+              <span data-icon="terminal"></span>
+              <span data-t="tabLogs">سجل الطلبات المباشر</span>
+            </button>
+            <button type="button" class="rail-btn" data-tab="tab-apps">
+              <span data-icon="desktop"></span>
+              <span data-t="tabApps">التطبيقات المرتبطة</span>
+            </button>
+            <button type="button" class="rail-btn" data-tab="tab-providers">
+              <span data-icon="database"></span>
+              <span data-t="tabProviders">المزود والنماذج</span>
+            </button>
+            <button type="button" class="rail-btn" data-tab="tab-shield">
+              <span data-icon="shield"></span>
+              <span data-t="tabShield">الدرع والتشخيص</span>
+            </button>
+          </nav>
+        </div>
+
+        <div class="sidebar-footer">
+          <div id="status-indicator-rail" class="status-pill">
+            <span class="status-dot"></span>
+            <span data-t="online">متصل على 18787</span>
+          </div>
+
+          <div class="version-pill">
+            <span class="mono" id="app-version-pill">v2.1.0</span>
+            <button type="button" id="btn-check-update" class="btn btn-sm" style="padding:3px 8px;font-size:0.72rem;" title="Check for Updates">
+              <span data-icon="download"></span>
+              <span data-t="btnCheckUpdate">تحديثات</span>
+            </button>
+          </div>
+
+          <div class="rail-controls-row">
+            <button type="button" id="btn-theme" class="btn btn-sm" aria-label="تبديل السمة">
+              <span id="theme-icon" data-icon="moon"></span>
+              <span id="theme-label" data-t="themeDark">داكن</span>
+            </button>
+            <button type="button" id="btn-lang" class="btn btn-sm" aria-label="تبديل اللغة">
+              <span data-icon="globe"></span>
+              <span data-t="btnLang">English</span>
+            </button>
+          </div>
+
+          <button type="button" id="btn-restart" class="btn btn-sm btn-primary" style="width:100%;">
+            <span data-icon="refresh"></span>
+            <span data-t="btnRestart">إعادة تشغيل الجسر</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Workspace -->
+      <div class="main-area">
+        <header class="topbar">
+          <div class="topbar-meta">
+            <div class="mobile-brand">
+              <div class="brand-mini-orb" data-icon="sparkles" aria-hidden="true"></div>
+            </div>
+            <div>
+              <h1 id="active-page-title" class="page-heading" data-t="tabUsage">المؤشرات العامة</h1>
+              <div id="topbar-submeta" class="brand-subtitle mono">http://127.0.0.1:18787 • PID —</div>
+            </div>
+          </div>
+
+          <div class="topbar-actions">
+            <div id="status-indicator" class="status-pill">
+              <span class="status-dot"></span>
+              <span data-t="online">متصل على 18787</span>
+            </div>
+            <button type="button" id="btn-theme-mobile" class="btn btn-sm mobile-only-btn" aria-label="تبديل السمة">
+              <span id="theme-icon-mobile" data-icon="moon"></span>
+            </button>
+            <button type="button" id="btn-lang-mobile" class="btn btn-sm mobile-only-btn" aria-label="تبديل اللغة">
+              <span data-icon="globe"></span>
+            </button>
+            <button type="button" id="btn-open-probe" class="btn btn-sm">
+              <span data-icon="zap"></span>
+              <span data-t="btnProbeModels">فحص النماذج حياً</span>
+            </button>
+          </div>
+        </header>
+
+        <main class="main-scroll">
+          <!-- Connection Recovery Banner -->
+          <div id="offline-banner" class="error-banner" style="display:none;" role="alert">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span data-icon="alert"></span>
+              <span data-t="offlineBannerText">تعذر الاتصال بخادم الجسر المحلي على المنفذ 18787. تأكد من تشغيل الخدمة ثم أعد المحاولة.</span>
+            </div>
+            <button type="button" id="btn-retry-health" class="btn btn-sm" style="background:var(--surface-elevated);">
+              <span data-icon="refresh"></span>
+              <span data-t="btnRetry">إعادة المحاولة</span>
+            </button>
+          </div>
+
+          <!-- GitHub Release Update Banner -->
+          <div id="update-banner" class="update-banner" style="display:none;" role="status">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span data-icon="rocket" style="color:var(--accent-secondary);"></span>
+              <span id="update-banner-text">يتوفر إصدار جديد على GitHub</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <button type="button" id="btn-install-update" class="btn btn-sm btn-primary">
+                <span data-icon="download"></span>
+                <span data-t="btnInstallUpdate">تحديث وتثبيت الآن</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- PAGE 1: OVERVIEW & MODEL USAGE -->
+          <section id="tab-usage" class="tab-pane active">
+            <div class="hub-hero-card">
+              <div class="orb-stage">
+                <div class="orb-backlight" aria-hidden="true"></div>
+                <button type="button" id="hero-orb-btn" class="pearlescent-orb" aria-label="فحص النماذج حياً">
+                  <div class="orb-cyan-arc" aria-hidden="true"></div>
+                  <div class="orb-specular-top" aria-hidden="true"></div>
+                  <div class="orb-specular-bottom" aria-hidden="true"></div>
+                  <div class="orb-rim" aria-hidden="true"></div>
+                  <span class="orb-core-badge">
+                    <span data-icon="sparkles"></span>
+                    <span id="orb-badge-text" data-t="orbReady">جاهز</span>
+                  </span>
+                </button>
+                <div class="orb-reflection" aria-hidden="true"></div>
+              </div>
+
+              <div class="hub-hero-copy">
+                <h2 class="hub-hero-title" data-t="heroTitle">مركز جسر الاستجابات المتكامل</h2>
+                <p class="hub-hero-sub" data-t="heroSubtitle">تحويل فوري بدون فقدان بين Anthropic Messages و OpenAI Responses مع دعم الرؤية والملفات والتفكير حتى xhigh.</p>
+                <div class="hub-chips">
+                  <span class="chip chip-ok"><span data-icon="image"></span><span data-t="capImages">الصور واللقطات</span></span>
+                  <span class="chip chip-ok"><span data-icon="file"></span><span data-t="capPdf">ملفات PDF</span></span>
+                  <span class="chip chip-ok"><span data-icon="cpu"></span><span id="chip-effort">Effort: medium</span></span>
+                  <span class="chip"><span data-icon="shield"></span><span id="chip-uptime">Uptime: 0s</span></span>
+                </div>
+              </div>
+
+              <div class="hub-hero-actions">
+                <button type="button" id="btn-hero-probe" class="btn btn-primary">
+                  <span data-icon="zap"></span>
+                  <span data-t="btnProbeModels">فحص النماذج حياً</span>
+                </button>
+                <button type="button" id="btn-hero-refresh" class="btn">
+                  <span data-icon="refresh"></span>
+                  <span data-t="btnRefreshNow">تحديث البيانات</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="bento-grid">
+              <article class="card">
+                <div class="card-header">
+                  <span class="card-title" data-t="statTotalRequests">إجمالي الطلبات</span>
+                  <span class="card-icon" data-icon="zap"></span>
+                </div>
+                <div class="stat-value" id="stat-total-req">0</div>
+                <div class="stat-subtext" data-t="statTotalRequestsSub">طلبات مسجلة عبر الجسر</div>
+              </article>
+
+              <article class="card">
+                <div class="card-header">
+                  <span class="card-title" data-t="statTotalTokens">إجمالي التوكنات</span>
+                  <span class="card-icon" data-icon="cpu"></span>
+                </div>
+                <div class="stat-value" id="stat-total-tokens">0</div>
+                <div class="stat-subtext" id="stat-inout-sub">0 in / 0 out</div>
+              </article>
+
+              <article class="card">
+                <div class="card-header">
+                  <span class="card-title" data-t="statCachedTokens">الموفّر بالكاش</span>
+                  <span class="card-icon" data-icon="database" style="color:var(--status-online);"></span>
+                </div>
+                <div class="stat-value" id="stat-cached-tokens" style="color:var(--status-online);">0</div>
+                <div class="stat-subtext" id="stat-cache-percent">نسبة الكاش: 0%</div>
+              </article>
+
+              <article class="card">
+                <div class="card-header">
+                  <span class="card-title" data-t="statShieldSaves">عمليات إنقاذ الدرع</span>
+                  <span class="card-icon" data-icon="shield" style="color:var(--accent-secondary);"></span>
+                </div>
+                <div class="stat-value" id="stat-shield-saves" style="color:var(--accent-secondary);">0</div>
+                <div class="stat-subtext" id="stat-errors-sub">إعادة المحاولة: 0</div>
+              </article>
+            </div>
+
+            <div class="section-header">
+              <div>
+                <h2 class="section-title" data-t="sectionModelUsage">توزيع استهلاك النماذج</h2>
+                <p class="section-subtitle" data-t="sectionModelUsageSub">الاستهلاك الفعلي المسجل لكل فئة نموذج</p>
+              </div>
+              <button type="button" class="btn btn-sm" data-nav-jump="tab-agents">
+                <span data-icon="bot"></span>
+                <span data-t="btnViewAgentStats">عرض إحصائيات كل وكيل</span>
+              </button>
+            </div>
+
+            <div class="models-grid">
+              <article class="card">
+                <div class="model-head">
+                  <div>
+                    <span class="model-tier" data-t="tierOpus">Opus Tier (الرئيسي)</span>
+                    <strong class="model-name mono" id="model-name-opus">gpt-6.1-sol</strong>
+                  </div>
+                  <span class="chip" id="model-opus-reqs">0</span>
+                </div>
+                <div class="progress-track">
+                  <div id="model-opus-bar" class="progress-fill fill-opus" style="width:0%;"></div>
+                </div>
+                <div class="model-stats-row">
+                  <span><span data-t="tokensWord">التوكنات</span>: <strong id="model-opus-tokens">0</strong></span>
+                  <strong id="model-opus-pct">0%</strong>
+                </div>
+              </article>
+
+              <article class="card">
+                <div class="model-head">
+                  <div>
+                    <span class="model-tier" data-t="tierSonnet">Sonnet Tier (المتوازن)</span>
+                    <strong class="model-name mono" id="model-name-sonnet">gpt-6-astra</strong>
+                  </div>
+                  <span class="chip" id="model-sonnet-reqs">0</span>
+                </div>
+                <div class="progress-track">
+                  <div id="model-sonnet-bar" class="progress-fill fill-sonnet" style="width:0%;"></div>
+                </div>
+                <div class="model-stats-row">
+                  <span><span data-t="tokensWord">التوكنات</span>: <strong id="model-sonnet-tokens">0</strong></span>
+                  <strong id="model-sonnet-pct">0%</strong>
+                </div>
+              </article>
+
+              <article class="card">
+                <div class="model-head">
+                  <div>
+                    <span class="model-tier" data-t="tierHaiku">Haiku Tier (الوكلاء والمهام الخفيفة)</span>
+                    <strong class="model-name mono" id="model-name-haiku">gpt-5.6-sol</strong>
+                  </div>
+                  <span class="chip" id="model-haiku-reqs">0</span>
+                </div>
+                <div class="progress-track">
+                  <div id="model-haiku-bar" class="progress-fill fill-haiku" style="width:0%;"></div>
+                </div>
+                <div class="model-stats-row">
+                  <span><span data-t="tokensWord">التوكنات</span>: <strong id="model-haiku-tokens">0</strong></span>
+                  <strong id="model-haiku-pct">0%</strong>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <!-- PAGE 2: PER-AGENT ANALYTICS -->
+          <section id="tab-agents" class="tab-pane">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title" data-t="sectionAgentsTitle">إحصائيات كل وكيل وعميل بالتفصيل</h2>
+                <p class="section-subtitle" data-t="sectionAgentsSub">تتبع استهلاك التوكنات، نسبة الكاش، متوسط زمن الاستجابة، والنماذج المستخدمة لكل وكيل على حدة</p>
+              </div>
+              <button type="button" id="btn-clear-telemetry" class="btn btn-sm">
+                <span data-icon="refresh"></span>
+                <span data-t="btnResetStats">تصفير الإحصائيات</span>
+              </button>
+            </div>
+
+            <div id="agents-empty" class="empty-state">
+              <span data-icon="bot"></span>
+              <strong data-t="agentsEmptyTitle">لم يُسجّل نشاط للوكلاء بعد</strong>
+              <p style="font-size:0.82rem;max-width:460px;" data-t="agentsEmptySub">عند تشغيل أي طلب عبر Claude Code أو الوكلاء الفرعيين (Subagents) أو DeepSeek Harness أو Claude Desktop ستظهر بطاقة إحصائيات تفصيلية لكل وكيل هنا.</p>
+            </div>
+
+            <div id="agents-grid" class="agents-grid" style="display:none;"></div>
+
+            <div id="agents-table-card" class="card" style="display:none;">
+              <div class="card-header">
+                <strong class="card-title" data-t="agentComparisonTitle">جدول المقارنة التفصيلي بين الوكلاء</strong>
+                <span class="card-icon" data-icon="activity"></span>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th data-t="colAgent">الوكيل / التطبيق</th>
+                      <th data-t="colReqs">الطلبات</th>
+                      <th data-t="colErrs">الأخطاء</th>
+                      <th data-t="colInTokens">دخول</th>
+                      <th data-t="colOutTokens">خروج</th>
+                      <th data-t="colCacheHit">توفير الكاش</th>
+                      <th data-t="colAvgLatency">متوسط الزمن</th>
+                      <th data-t="colLastSeen">آخر نشاط</th>
+                    </tr>
+                  </thead>
+                  <tbody id="agents-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- PAGE 3: LIVE REQUEST LOGS -->
+          <section id="tab-logs" class="tab-pane">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title" data-t="sectionRecentLogs">سجل الطلبات المباشر</h2>
+                <p class="section-subtitle" data-t="sectionRecentLogsSub">مراقبة وتصفية الطلبات المعالجة عبر الجسر لحظة بلحظة</p>
+              </div>
+              <div class="filter-bar">
+                <select id="filter-client" class="form-control" aria-label="تصفية حسب الوكيل">
+                  <option value="all" data-t="filterAllClients">كل الوكلاء</option>
+                </select>
+                <select id="filter-model" class="form-control" aria-label="تصفية حسب النموذج">
+                  <option value="all" data-t="filterAllModels">كل النماذج</option>
+                </select>
+                <button type="button" id="btn-clear-logs" class="btn btn-sm">
+                  <span data-icon="close"></span>
+                  <span data-t="btnClearLogs">مسح السجل</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div id="logs-empty" class="empty-state">
+                <span data-icon="activity"></span>
+                <strong data-t="logsEmptyTitle">لا توجد طلبات مسجلة تطابق التصفية</strong>
+                <p style="font-size:0.82rem;max-width:440px;" data-t="logsEmptySub">عند استخدام Claude Code أو DeepSeek Harness أو تشغيل فحص النماذج المباشر ستظهر السجلات الدقيقة هنا.</p>
+              </div>
+              <div id="logs-table-wrap" class="table-wrap" style="display:none;">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th data-t="colTime">الوقت</th>
+                      <th data-t="colClient">الوكيل</th>
+                      <th data-t="colModel">النموذج</th>
+                      <th data-t="colStatus">الحالة</th>
+                      <th data-t="colTokens">التوكنات (دخول / خروج / كاش)</th>
+                      <th data-t="colLatency">الزمن</th>
+                    </tr>
+                  </thead>
+                  <tbody id="logs-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <!-- PAGE 4: CONNECTED APPS -->
+          <section id="tab-apps" class="tab-pane">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title" data-t="sectionAppsTitle">التطبيقات المكتشفة والمزامنة بنقرة واحدة</h2>
+                <p class="section-subtitle" data-t="sectionAppsSub">تطبيق إعدادات النماذج والقدرات والتفكير والوسائط المتعددة تلقائياً</p>
+              </div>
+            </div>
+
+            <div class="apps-grid">
+              <article class="card">
+                <div class="card-header">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div class="card-icon" data-icon="terminal"></div>
+                    <div>
+                      <h3 style="font-size:0.96rem;font-weight:800;" data-t="appClaudeCodeTitle">Claude Code CLI</h3>
+                      <p class="brand-subtitle" data-t="appClaudeCodeDesc">الطرفية وتكامل المطورين</p>
+                    </div>
+                  </div>
+                  <span id="badge-claude-code" class="chip chip-ok">...</span>
+                </div>
+
+                <div class="info-box">
+                  <div class="info-row">
+                    <span class="info-key" data-t="lblConfigPath">ملف الإعدادات</span>
+                    <span class="info-val mono">~/.claude/settings.json</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-key" data-t="lblCapabilities">القدرات المفعّلة</span>
+                    <span class="info-val">Effort xhigh + Vision + PDF</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-key" data-t="lblVoiceNote">ملاحظة الصوت (/voice)</span>
+                    <span class="info-val" data-t="cliVoiceLimit">يتطلب حساب Claude.ai رسمي</span>
+                  </div>
+                </div>
+
+                <button type="button" id="btn-apply-code" class="btn btn-primary" style="width:100%;">
+                  <span data-icon="check"></span>
+                  <span data-t="btnApplyCode">مزامنة وتطبيق على Claude Code</span>
+                </button>
+              </article>
+
+              <article class="card">
+                <div class="card-header">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div class="card-icon" data-icon="bot" style="color:var(--accent-violet);"></div>
+                    <div>
+                      <h3 style="font-size:0.96rem;font-weight:800;" data-t="appDshTitle">DeepSeek Harness</h3>
+                      <p class="brand-subtitle" data-t="appDshDesc">عميل سطح المكتب (dsh / pi-ai)</p>
+                    </div>
+                  </div>
+                  <span id="badge-dsh" class="chip chip-ok">...</span>
+                </div>
+
+                <div class="info-box">
+                  <div class="info-row">
+                    <span class="info-key" data-t="lblConfigPath">ملف البروفايل</span>
+                    <span class="info-val mono">~/.dsh/.../cordis.patch.yml</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-key" data-t="lblProtocol">البروتوكول</span>
+                    <span class="info-val mono">openai-responses</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-key" data-t="lblModalities">الصور ومستويات التفكير</span>
+                    <span class="info-val">text + image + off..xhigh</span>
+                  </div>
+                </div>
+
+                <button type="button" id="btn-apply-dsh" class="btn btn-primary" style="width:100%;">
+                  <span data-icon="check"></span>
+                  <span data-t="btnApplyDsh">مزامنة وتطبيق على DeepSeek Harness</span>
+                </button>
+              </article>
+
+              <article class="card">
+                <div class="card-header">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <div class="card-icon" data-icon="desktop" style="color:var(--accent-secondary);"></div>
+                    <div>
+                      <h3 style="font-size:0.96rem;font-weight:800;" data-t="appClaudeDesktopTitle">Claude Desktop</h3>
+                      <p class="brand-subtitle" data-t="appClaudeDesktopDesc">تطبيق سطح المكتب (Claude-3p)</p>
+                    </div>
+                  </div>
+                  <span id="badge-claude-desktop" class="chip chip-ok">...</span>
+                </div>
+
+                <div class="info-box">
+                  <div class="info-row">
+                    <span class="info-key" data-t="lblGateway">البوابة المباشرة</span>
+                    <span class="info-val mono">http://127.0.0.1:18787</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-key" data-t="lblGuid">معرّف التكوين</span>
+                    <span class="info-val mono">...000000187870</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-key" data-t="lblDirectMode">الوضع المباشر</span>
+                    <span class="info-val" data-t="directGatewayOk">مربوط مباشرة بالجسر</span>
+                  </div>
+                </div>
+
+                <button type="button" id="btn-apply-desktop" class="btn btn-primary" style="width:100%;">
+                  <span data-icon="check"></span>
+                  <span data-t="btnApplyDesktop">تطبيق الإعدادات على Claude Desktop</span>
+                </button>
+              </article>
+            </div>
+          </section>
+
+          <!-- PAGE 5: PROVIDERS, MODELS & REASONING -->
+          <section id="tab-providers" class="tab-pane">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title" data-t="sectionProvidersTitle">إدارة المزود والنماذج ومستوى التفكير</h2>
+                <p class="section-subtitle" data-t="sectionProvidersSub">تُحفظ التعديلات تلقائياً في ملف .env الخاص بالجسر وتعمل فوراً</p>
+              </div>
+            </div>
+
+            <div class="rainbow-halo-box">
+              <div class="rainbow-halo-inner">
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="prov-url" class="form-label" data-t="lblUpstreamUrl">عنوان المزود الرئيسي (Upstream Base URL)</label>
+                    <input type="text" id="prov-url" class="form-control mono" value="https://agentrouter.org">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="prov-key" class="form-label" data-t="lblApiKey">مفتاح API (اتركه فارغاً للإبقاء على الحالي)</label>
+                    <div class="input-with-action">
+                      <input type="password" id="prov-key" class="form-control mono" placeholder="sk-...">
+                      <button id="btn-toggle-key" type="button" class="input-inline-btn" data-t="btnShow">إظهار</button>
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="prov-opus" class="form-label" data-t="lblOpusModel">نموذج فئة Opus (المهام الهندسية المعقدة)</label>
+                    <input type="text" id="prov-opus" class="form-control mono" value="gpt-6.1-sol">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="prov-sonnet" class="form-label" data-t="lblSonnetModel">نموذج فئة Sonnet (المهام المتوازنة)</label>
+                    <input type="text" id="prov-sonnet" class="form-control mono" value="gpt-6-astra">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="prov-haiku" class="form-label" data-t="lblHaikuModel">نموذج فئة Haiku (الوكلاء والمهام الخفيفة)</label>
+                    <input type="text" id="prov-haiku" class="form-control mono" value="gpt-5.6-sol">
+                  </div>
+
+                  <div class="form-group">
+                    <label for="prov-reasoning" class="form-label" data-t="lblReasoningEffort">مستوى التفكير الافتراضي (Reasoning Effort)</label>
+                    <select id="prov-reasoning" class="form-control">
+                      <option value="xhigh">xhigh — أقصى عمق تحليلي واستدلال</option>
+                      <option value="high">high — تفكير عميق للمهام الصعبة</option>
+                      <option value="medium" selected>medium — متوازن وموصى به</option>
+                      <option value="low">low — سريع وأقل استهلاكاً</option>
+                      <option value="minimal">minimal — خفيف جداً</option>
+                      <option value="none">none — إيقاف التفكير</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group full-width">
+                    <label for="prov-summary" class="form-label" data-t="lblReasoningSummary">ملخص التفكير (Reasoning Summary)</label>
+                    <select id="prov-summary" class="form-control">
+                      <option value="auto" selected>auto — عرض ملخص التفكير تلقائياً</option>
+                      <option value="detailed">detailed — ملخص تفصيلي</option>
+                      <option value="concise">concise — ملخص مختصر</option>
+                      <option value="none">none — بدون ملخص</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap;margin-top:20px;">
+                  <button type="button" id="btn-probe-inline" class="btn">
+                    <span data-icon="zap"></span>
+                    <span data-t="btnProbeModels">فحص النماذج حياً</span>
+                  </button>
+                  <button type="button" id="btn-save-provider" class="btn btn-primary">
+                    <span data-icon="check"></span>
+                    <span data-t="btnSaveProvider">حفظ وتطبيق الإعدادات</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- PAGE 6: SHIELD & CAPABILITY DIAGNOSTICS -->
+          <section id="tab-shield" class="tab-pane">
+            <div class="section-header">
+              <div>
+                <h2 class="section-title" data-t="sectionShieldTitle">درع الحماية ومصفوفة القدرات</h2>
+                <p class="section-subtitle" data-t="sectionShieldSub">ضبط إعادة المحاولة التلقائية وحالة دعم الصور والصوت والملفات والتفكير</p>
+              </div>
+            </div>
+
+            <div class="pair-grid">
+              <article class="card">
+                <div class="card-header">
+                  <strong class="card-title" data-t="shieldTuningTitle">ضبط معايير درع Pre-Commit SSE</strong>
+                  <span class="card-icon" data-icon="shield"></span>
+                </div>
+
+                <div class="form-grid">
+                  <div class="form-group">
+                    <label for="shield-retries" class="form-label" data-t="lblMaxRetries">أقصى عدد محاولات (Retries)</label>
+                    <input type="number" id="shield-retries" class="form-control mono" min="0" max="15" value="6">
+                  </div>
+                  <div class="form-group">
+                    <label for="shield-headroom" class="form-label" data-t="lblHeadroom">هامش توكنات التفكير (Headroom)</label>
+                    <input type="number" id="shield-headroom" class="form-control mono" min="512" max="32768" value="4096">
+                  </div>
+                  <div class="form-group">
+                    <label for="shield-delay" class="form-label" data-t="lblRetryDelay">تأخير المحاولة الأساسي (ms)</label>
+                    <input type="number" id="shield-delay" class="form-control mono" min="500" max="30000" value="6000">
+                  </div>
+                  <div class="form-group">
+                    <label for="shield-concurrency" class="form-label" data-t="lblConcurrency">أقصى طلبات ثقيلة متزامنة</label>
+                    <input type="number" id="shield-concurrency" class="form-control mono" min="1" max="10" value="2">
+                  </div>
+                </div>
+
+                <button type="button" id="btn-save-shield" class="btn btn-primary" style="width:100%;">
+                  <span data-icon="check"></span>
+                  <span data-t="btnSaveShield">حفظ معايير الدرع</span>
+                </button>
+              </article>
+
+              <article class="card">
+                <div class="card-header">
+                  <strong class="card-title" data-t="capMatrixTitle">مصفوفة دعم الوسائط والتفكير (الحقيقة الفعلية)</strong>
+                  <span class="card-icon" data-icon="sparkles"></span>
+                </div>
+
+                <div class="info-box">
+                  <div class="info-row">
+                    <span class="info-key" data-t="matVision">الصور واللقطات (Vision)</span>
+                    <span class="chip chip-ok" data-t="matSupported">مدعوم بالكامل</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-key" data-t="matPdf">مستندات PDF</span>
+                    <span class="chip chip-ok" data-t="matSupported">مدعوم بالكامل</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-key" data-t="matThinking">مستويات التفكير (low → xhigh)</span>
+                    <span class="chip chip-ok" data-t="matSupported">مدعوم بالكامل</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-key" data-t="matAudioApi">إدخال الصوت المباشر للنموذج (input_audio)</span>
+                    <span class="chip chip-warn" data-t="matUpstreamNo">غير متاح في agentrouter.org</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="info-key" data-t="matDshVoice">الإدخال الصوتي المحلي في DeepSeek Harness</span>
+                    <span class="chip chip-ok" data-t="matLocalStt">متاح محلياً (SenseVoice)</span>
+                  </div>
+                </div>
+
+                <p style="font-size:0.8rem;color:var(--text-muted);line-height:1.6;" data-t="capMatrixNote">
+                  أمر /voice داخل Claude Code مقيد برمجياً بحسابات Claude.ai الرسمية، بينما يدعم DeepSeek Harness الإدخال الصوتي المحلي عبر إضافة Voice Input بعد تنزيل نموذج SenseVoice من مدير الإضافات.
+                </p>
+              </article>
+            </div>
+
+            <article class="card">
+              <div class="card-header">
+                <strong class="card-title" data-t="updatesCardTitle">الإصدار والتحديث التلقائي عبر GitHub</strong>
+                <span class="card-icon" data-icon="rocket"></span>
+              </div>
+              <div class="info-box">
+                <div class="info-row">
+                  <span class="info-key" data-t="lblCurrentVersion">الإصدار المثبت حالياً</span>
+                  <span class="chip mono" id="shield-current-ver">v2.1.0</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-key" data-t="lblLatestVersion">أحدث إصدار على GitHub</span>
+                  <span class="chip mono" id="shield-latest-ver">—</span>
+                </div>
+                <div class="info-row">
+                  <span class="info-key" data-t="lblGithubRepo">المستودع مفتوح المصدر</span>
+                  <a href="https://github.com/Mstrq4/claude-switch-pro" target="_blank" rel="noopener" class="mono" style="color:var(--accent-secondary);text-decoration:none;font-weight:700;">Mstrq4/claude-switch-pro</a>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px;">
+                <button type="button" id="btn-check-update-card" class="btn btn-sm">
+                  <span data-icon="refresh"></span>
+                  <span data-t="btnCheckUpdatesFull">التحقق من التحديثات الآن</span>
+                </button>
+                <button type="button" id="btn-install-update-card" class="btn btn-sm btn-primary" style="display:none;">
+                  <span data-icon="download"></span>
+                  <span data-t="btnInstallUpdate">تحديث وتثبيت الآن</span>
+                </button>
+              </div>
+            </article>
+          </section>
+        </main>
+
+        <!-- Mobile Bottom Navigation Dock -->
+        <nav class="mobile-dock" aria-label="التنقل السريع">
+          <button type="button" class="dock-btn active" data-tab="tab-usage">
+            <span data-icon="activity"></span>
+            <span data-t="dockUsage">المؤشرات</span>
+          </button>
+          <button type="button" class="dock-btn" data-tab="tab-agents">
+            <span data-icon="bot"></span>
+            <span data-t="dockAgents">الوكلاء</span>
+          </button>
+          <button type="button" class="dock-btn" data-tab="tab-logs">
+            <span data-icon="terminal"></span>
+            <span data-t="dockLogs">السجل</span>
+          </button>
+          <button type="button" class="dock-btn" data-tab="tab-apps">
+            <span data-icon="desktop"></span>
+            <span data-t="dockApps">التطبيقات</span>
+          </button>
+          <button type="button" class="dock-btn" data-tab="tab-providers">
+            <span data-icon="database"></span>
+            <span data-t="dockProviders">النماذج</span>
+          </button>
+          <button type="button" class="dock-btn" data-tab="tab-shield">
+            <span data-icon="shield"></span>
+            <span data-t="dockShield">الدرع</span>
+          </button>
+        </nav>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Model Probe Modal -->
+  <div id="probe-modal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="probe-modal-title">
+    <div class="modal-card">
+      <div class="card-header">
+        <div>
+          <h3 id="probe-modal-title" style="font-size:1.05rem;font-weight:800;" data-t="probeModalTitle">نتيجة الفحص الحي للنماذج</h3>
+          <p class="brand-subtitle" data-t="probeModalSub">اختبار فعلي مباشر لكل نموذج مع المزود الحالي</p>
+        </div>
+        <button type="button" id="btn-close-probe" class="btn btn-sm" aria-label="إغلاق">
+          <span data-icon="close"></span>
+        </button>
+      </div>
+      <div id="probe-modal-body" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;">
+        <button type="button" id="btn-rerun-probe" class="btn btn-primary btn-sm">
+          <span data-icon="refresh"></span>
+          <span data-t="btnRerunProbe">إعادة الفحص</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Viewport -->
+  <div id="toast-container" class="toast-container" role="status" aria-live="polite"></div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

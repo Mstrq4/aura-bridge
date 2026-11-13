@@ -1,10 +1,17 @@
 @echo off
-chcp 65001 >nul
-title إلغاء تثبيت Claude Switch Pro
-echo =========================================================
-echo  إلغاء تثبيت Claude Switch Pro
-echo =========================================================
+setlocal
+echo Stopping Claude Switch Pro...
 taskkill /F /IM claude-switch-pro.exe >nul 2>&1
-powershell -NoProfile -Command "Remove-Item -Path \"$([Environment]::GetFolderPath('Desktop'))\Claude Switch Pro.lnk\" -Force -ErrorAction SilentlyContinue; Remove-Item -Path \"$([Environment]::GetFolderPath('Programs'))\Claude Switch Pro.lnk\" -Force -ErrorAction SilentlyContinue; Remove-Item -Path \"$env:LOCALAPPDATA\Programs\ClaudeSwitchPro\" -Recurse -Force -ErrorAction SilentlyContinue;"
-echo تم إلغاء التثبيت وإزالة الاختصارات بنجاح.
+timeout /t 1 /nobreak >nul
+
+echo Removing installation directory, shortcuts, and registry entries...
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$d = [Environment]::GetFolderPath('Desktop'); Remove-Item -Force -ErrorAction SilentlyContinue ($d + '\Claude Switch Pro.lnk'); " ^
+  "$sm = [Environment]::GetFolderPath('Programs'); Remove-Item -Force -ErrorAction SilentlyContinue ($sm + '\Claude Switch Pro.lnk'); " ^
+  "Remove-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Run' -Name 'ClaudeSwitchPro' -ErrorAction SilentlyContinue; " ^
+  "Remove-Item -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\ClaudeSwitchPro' -Recurse -Force -ErrorAction SilentlyContinue; " ^
+  "$dir = Join-Path $env:LOCALAPPDATA 'Programs\ClaudeSwitchPro'; Remove-Item -Path $dir -Recurse -Force -ErrorAction SilentlyContinue"
+
+echo Claude Switch Pro uninstalled cleanly.
+echo User settings preserved at %LOCALAPPDATA%\ClaudeSwitchPro
 pause

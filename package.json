@@ -1,0 +1,12 @@
+﻿{
+  "name": "claude-switch-pro",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Claude Switch Pro — Cross-platform Aura Control Center & Resilient Responses Bridge",
+  "scripts": {
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.4"
+  }
+}

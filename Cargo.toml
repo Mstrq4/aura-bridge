@@ -1,16 +1,19 @@
-[package]
-name = "claude-switch-pro"
-version = "1.0.0"
+[workspace]
+resolver = "2"
+members = [
+  "crates/bridge-core",
+  "crates/setup-wizard",
+  "src-tauri",
+]
+
+[workspace.package]
+version = "2.1.0"
 edition = "2021"
-description = "Native Rust Desktop Application & System Tray Controller for Claude Responses Bridge"
-authors = ["Youssef UI / Advanced Agentic Coding"]
+license = "MIT"
+repository = "https://github.com/Mstrq4/claude-switch-pro"
 
-[[bin]]
-name = "claude-switch-pro"
-path = "src/main.rs"
-
-[[bin]]
-name = "ClaudeSwitchPro-Setup"
-path = "src/installer.rs"
-
-[dependencies]
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = "symbols"

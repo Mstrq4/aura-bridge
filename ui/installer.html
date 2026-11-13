@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Claude Switch Pro — Setup Wizard</title>
+  <style>
+    :root {
+      --font-ar: "Segoe UI", Tahoma, system-ui, -apple-system, sans-serif;
+      --font-en: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --bg: #faf7f5;
+      --mesh:
+        radial-gradient(at 15% 15%, rgba(255, 218, 190, 0.72) 0px, transparent 52%),
+        radial-gradient(at 86% 18%, rgba(226, 206, 255, 0.66) 0px, transparent 52%),
+        radial-gradient(at 50% 85%, rgba(214, 240, 255, 0.64) 0px, transparent 56%);
+      --card: rgba(255, 255, 255, 0.84);
+      --card-border: rgba(255, 255, 255, 0.94);
+      --subtle: rgba(241, 245, 249, 0.86);
+      --border: rgba(203, 213, 225, 0.72);
+      --text: #0f172a;
+      --text-sec: #475569;
+      --muted: #64748b;
+      --accent: #db2777;
+      --accent-2: #0284c7;
+      --accent-v: #7c3aed;
+      --ok: #059669;
+      --ok-bg: rgba(16, 185, 129, 0.14);
+      --err: #dc2626;
+      --shadow: 0 22px 54px -16px rgba(100, 116, 139, 0.28);
+    }
+
+    [data-theme="dark"] {
+      --bg: #090a12;
+      --mesh:
+        radial-gradient(at 18% 15%, rgba(124, 58, 237, 0.24) 0px, transparent 52%),
+        radial-gradient(at 85% 20%, rgba(236, 72, 153, 0.2) 0px, transparent 50%),
+        radial-gradient(at 50% 88%, rgba(14, 165, 233, 0.16) 0px, transparent 55%);
+      --card: rgba(20, 26, 45, 0.84);
+      --card-border: rgba(255, 255, 255, 0.11);
+      --subtle: rgba(30, 41, 59, 0.64);
+      --border: rgba(71, 85, 105, 0.55);
+      --text: #f8fafc;
+      --text-sec: #cbd5e1;
+      --muted: #94a3b8;
+      --accent: #f472b6;
+      --accent-2: #38bdf8;
+      --accent-v: #a78bfa;
+      --ok: #34d399;
+      --ok-bg: rgba(16, 185, 129, 0.18);
+      --err: #f87171;
+      --shadow: 0 26px 64px -18px rgba(0, 0, 0, 0.62);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      background-image: var(--mesh);
+      color: var(--text);
+      font-family: var(--font-ar);
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+    html[lang="en"] body { font-family: var(--font-en); }
+    .mono { font-family: var(--font-mono); }
+
+    .wizard-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      padding: 18px 22px 20px;
+      gap: 14px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 16px;
+      border-radius: 16px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .orb-mini {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #f472b6 36%, #7c3aed 72%, #0284c7 100%);
+      box-shadow: 0 0 18px rgba(236, 72, 153, 0.42);
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .brand-name { font-size: 0.98rem; font-weight: 800; letter-spacing: -0.01em; }
+    .brand-meta { font-size: 0.74rem; color: var(--muted); display: flex; gap: 8px; align-items: center; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--subtle);
+      border: 1px solid var(--border);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-sec);
+    }
+
+    .top-actions { display: flex; gap: 8px; align-items: center; }
+
+    .btn-ghost {
+      background: var(--subtle);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 11px;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 120ms ease, background 150ms ease;
+    }
+    .btn-ghost:hover { transform: translateY(-1px); }
+
+    /* Stepper Indicator */
+    .stepper {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .step-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 12px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      transition: all 180ms ease;
+    }
+    .step-chip.active {
+      color: var(--text);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(219, 39, 119, 0.16);
+    }
+    .step-chip.completed {
+      color: var(--ok);
+      border-color: rgba(16, 185, 129, 0.45);
+      background: var(--ok-bg);
+    }
+    .step-num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--subtle);
+      font-size: 0.72rem;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .step-chip.active .step-num {
+      background: linear-gradient(135deg, var(--accent), var(--accent-v));
+      color: #fff;
+    }
+    .step-chip.completed .step-num {
+      background: var(--ok);
+      color: #fff;
+    }
+
+    /* Stage */
+    .stage-card {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 22px 24px;
+      border-radius: 22px;
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+      overflow-y: auto;
+    }
+
+    .pane { display: none; flex-direction: column; gap: 16px; height: 100%; }
+    .pane.active { display: flex; }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 22px;
+      align-items: center;
+      margin: auto 0;
+    }
+
+    .orb-showcase {
+      width: 148px;
+      height: 148px;
+      margin: auto;
+      border-radius: 50%;
+      position: relative;
+      background:
+        radial-gradient(circle at 30% 28%, rgba(255, 255, 255, 0.96) 0%, rgba(244, 114, 182, 0.48) 38%, rgba(124, 58, 237, 0.62) 72%, rgba(2, 132, 199, 0.72) 100%);
+      box-shadow:
+        0 18px 42px -10px rgba(219, 39, 119, 0.42),
+        0 0 0 1px rgba(255, 255, 255, 0.65) inset;
+      animation: floatOrb 4.5s ease-in-out infinite;
+    }
+    @keyframes floatOrb {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+
+    .hero-title { font-size: 1.48rem; font-weight: 800; line-height: 1.3; }
+    .hero-sub { font-size: 0.88rem; color: var(--text-sec); line-height: 1.6; margin-top: 6px; }
+
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .feat-item {
+      padding: 10px 12px;
+      border-radius: 13px;
+      background: var(--subtle);
+      border: 1px solid var(--border);
+      font-size: 0.8rem;
+      line-height: 1.45;
+    }
+    .feat-item strong { display: block; color: var(--text); margin-bottom: 2px; font-size: 0.82rem; }
+    .feat-item span { color: var(--muted); font-size: 0.75rem; }
+
+    /* Step 2 Form */
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
+    .field-label { font-size: 0.82rem; font-weight: 700; color: var(--text-sec); }
+    .path-row { display: flex; gap: 8px; }
+    .input {
+      flex: 1;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--subtle);
+      color: var(--text);
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      outline: none;
+    }
+    .input:focus { border-color: var(--accent); }
+
+    .options-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .opt-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: var(--subtle);
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .opt-text strong { display: block; font-size: 0.82rem; }
+    .opt-text span { display: block; font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+    .opt-card input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Step 3 Progress */
+    .progress-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .progress-track {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: var(--subtle);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--accent), var(--accent-v), var(--accent-2));
+      transition: width 260ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .tasks-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .task-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 12px;
+      background: var(--subtle);
+      border: 1px solid var(--border);
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .task-row.running {
+      color: var(--text);
+      border-color: var(--accent-2);
+    }
+    .task-row.done {
+      color: var(--ok);
+      border-color: rgba(16, 185, 129, 0.45);
+      background: var(--ok-bg);
+    }
+    .task-row.error {
+      color: var(--err);
+      border-color: var(--err);
+    }
+    .task-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid currentColor;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.68rem;
+      flex-shrink: 0;
+    }
+    .task-row.running .task-dot {
+      border-top-color: transparent;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .log-box {
+      flex: 1;
+      min-height: 92px;
+      max-height: 140px;
+      overflow-y: auto;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.06);
+      border: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      line-height: 1.55;
+      color: var(--text-sec);
+      user-select: text;
+    }
+    [data-theme="dark"] .log-box { background: rgba(0, 0, 0, 0.36); }
+
+    /* Step 4 Complete */
+    .done-hero {
+      text-align: center;
+      margin: auto;
+      max-width: 540px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+    .done-badge {
+      width: 68px;
+      height: 68px;
+      border-radius: 50%;
+      background: var(--ok-bg);
+      border: 2px solid var(--ok);
+      color: var(--ok);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      font-weight: 800;
+    }
+
+    /* Footer Actions */
+    .wizard-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-v));
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      font-family: inherit;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 10px 22px -8px rgba(219, 39, 119, 0.45);
+      transition: transform 130ms ease, opacity 130ms ease;
+    }
+    .btn-primary:hover { transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+  </style>
+</head>
+<body>
+  <div class="wizard-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="orb-mini" aria-hidden="true"></div>
+        <div>
+          <div class="brand-name" data-t="brandTitle">معالج تثبيت Claude Switch Pro</div>
+          <div class="brand-meta">
+            <span class="pill mono" id="wiz-ver">v2.1.0</span>
+            <span class="pill mono" id="wiz-arch">windows-x86_64</span>
+            <span class="pill" id="wiz-mode-pill" data-t="modeFresh">تثبيت متكامل</span>
+          </div>
+        </div>
+      </div>
+      <div class="top-actions">
+        <button type="button" class="btn-ghost" id="btn-wiz-theme" data-t="btnTheme">داكن</button>
+        <button type="button" class="btn-ghost" id="btn-wiz-lang">English</button>
+      </div>
+    </header>
+
+    <div class="stepper" role="tablist">
+      <div class="step-chip active" data-step="1"><span class="step-num">1</span><span data-t="st1">الترحيب</span></div>
+      <div class="step-chip" data-step="2"><span class="step-num">2</span><span data-t="st2">المسار والخيارات</span></div>
+      <div class="step-chip" data-step="3"><span class="step-num">3</span><span data-t="st3">مراحل التثبيت</span></div>
+      <div class="step-chip" data-step="4"><span class="step-num">4</span><span data-t="st4">الاكتمال والتشغيل</span></div>
+    </div>
+
+    <main class="stage-card">
+      <!-- STEP 1 -->
+      <section class="pane active" id="pane-1">
+        <div class="hero-grid">
+          <div class="orb-showcase" aria-hidden="true"></div>
+          <div>
+            <h1 class="hero-title" data-t="heroTitle">مركز تحكم وجسر نماذج AI الأصلي</h1>
+            <p class="hero-sub" data-t="heroSub">
+              تطبيق سطح مكتب مدمج فوري الإقلاع مع جسر Rust مدمج عالي الأداء ومزامنة تلقائية لـ Claude Code CLI و DeepSeek Harness وتحديثات تلقائية من GitHub.
+            </p>
+            <div class="feat-grid">
+              <div class="feat-item">
+                <strong data-t="f1Title">إقلاع فوري بدون شاشة رمادية</strong>
+                <span data-t="f1Desc">نواة WebView2 مدمجة دون الاعتماد على متصفح خارجي أو Node.js</span>
+              </div>
+              <div class="feat-item">
+                <strong data-t="f2Title">محرك Responses + درع الحماية</strong>
+                <span data-t="f2Desc">دعم Vision و PDF وتفكير xhigh وحماية استباقية ضد 429</span>
+              </div>
+              <div class="feat-item">
+                <strong data-t="f3Title">مزامنة بنقرة واحدة</strong>
+                <span data-t="f3Desc">تهيئة فورية لـ Claude Code و DeepSeek Harness و Desktop</span>
+              </div>
+              <div class="feat-item">
+                <strong data-t="f4Title">تحديثات GitHub التلقائية</strong>
+                <span data-t="f4Desc">تنزيل وتثبيت الإصدارات الجديدة موقّعة رقمياً بضغطة واحدة</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="wizard-footer">
+          <span class="pill" data-t="licenseTag">مفتوح المصدر — MIT License</span>
+          <div style="display:flex;gap:8px;">
+            <button type="button" class="btn-ghost" id="btn-cancel-1" data-t="btnCancel">إلغاء</button>
+            <button type="button" class="btn-primary" id="btn-next-1" data-t="btnStart">بدء الإعداد</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 2 -->
+      <section class="pane" id="pane-2">
+        <div>
+          <h2 style="font-size:1.15rem;font-weight:800;" data-t="s2Title">اختر مسار التثبيت والخيارات المتكاملة</h2>
+          <p style="font-size:0.82rem;color:var(--muted);margin-top:4px;" data-t="s2Sub">سيتم نقل إعدادات .env وإحصائياتك السابقة تلقائياً دون أي فقد.</p>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="install-dir" data-t="lblInstallDir">مجلد التثبيت</label>
+          <div class="path-row">
+            <input type="text" class="input" id="install-dir" value="C:\Users\samsung\AppData\Local\Programs\ClaudeSwitchPro">
+            <button type="button" class="btn-ghost" id="btn-browse" data-t="btnBrowse">استعراض...</button>
+          </div>
+        </div>
+
+        <div class="options-list">
+          <label class="opt-card">
+            <div class="opt-text">
+              <strong data-t="optDesktop">اختصار سطح المكتب</strong>
+              <span data-t="optDesktopDesc">إضافة أيقونة Aura على سطح المكتب</span>
+            </div>
+            <input type="checkbox" id="chk-desktop" checked>
+          </label>
+          <label class="opt-card">
+            <div class="opt-text">
+              <strong data-t="optStartMenu">اختصار قائمة ابدأ</strong>
+              <span data-t="optStartMenuDesc">تثبيت التطبيق في قائمة ابدأ وإلغاء التثبيت</span>
+            </div>
+            <input type="checkbox" id="chk-startmenu" checked>
+          </label>
+          <label class="opt-card">
+            <div class="opt-text">
+              <strong data-t="optAutoStart">التشغيل مع بدء النظام</strong>
+              <span data-t="optAutoStartDesc">إبقاء الجسر جاهزاً في شريط المهام عند تسجيل الدخول</span>
+            </div>
+            <input type="checkbox" id="chk-autostart" checked>
+          </label>
+          <label class="opt-card">
+            <div class="opt-text">
+              <strong data-t="optSyncApps">مزامنة الأدوات تلقائياً</strong>
+              <span data-t="optSyncAppsDesc">تحديث Claude Code و DeepSeek Harness فور التثبيت</span>
+            </div>
+            <input type="checkbox" id="chk-sync" checked>
+          </label>
+        </div>
+
+        <div class="wizard-footer" style="margin-top:auto;">
+          <button type="button" class="btn-ghost" id="btn-back-2" data-t="btnBack">السابق</button>
+          <button type="button" class="btn-primary" id="btn-install-now" data-t="btnInstallNow">تثبيت الآن</button>
+        </div>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="pane" id="pane-3">
+        <div class="progress-header">
+          <div>
+            <h2 style="font-size:1.12rem;font-weight:800;" id="prog-heading" data-t="s3Title">جاري تثبيت المكونات وتهيئة النظام...</h2>
+            <p style="font-size:0.78rem;color:var(--muted);margin-top:2px;" id="prog-sub" data-t="s3Sub">يرجى الانتظار بضع ثوانٍ</p>
+          </div>
+          <span class="pill mono" id="prog-pct" style="font-size:0.9rem;">0%</span>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" id="prog-bar"></div>
+        </div>
+
+        <div class="tasks-grid">
+          <div class="task-row" id="task-stop_existing"><span class="task-dot">1</span><span data-t="tStop">إيقاف أي عملية سابقة وتحضير المسار</span></div>
+          <div class="task-row" id="task-extract_bin"><span class="task-dot">2</span><span data-t="tExtract">نسخ التطبيق الموحد والأيقونات</span></div>
+          <div class="task-row" id="task-migrate_data"><span class="task-dot">3</span><span data-t="tMigrate">ترحيل الإعدادات والبيانات السابقة</span></div>
+          <div class="task-row" id="task-shortcuts"><span class="task-dot">4</span><span data-t="tShortcuts">تسجيل النظام وإنشاء الاختصارات</span></div>
+          <div class="task-row" id="task-sync_apps"><span class="task-dot">5</span><span data-t="tSync">التشغيل التلقائي ومزامنة التطبيقات</span></div>
+          <div class="task-row" id="task-verify"><span class="task-dot">6</span><span data-t="tVerify">التحقق من السلامة والجاهزية</span></div>
+        </div>
+
+        <div class="log-box" id="install-log">Initializing Aura Setup Wizard...</div>
+      </section>
+
+      <!-- STEP 4 -->
+      <section class="pane" id="pane-4">
+        <div class="done-hero">
+          <div class="done-badge" id="done-icon">✓</div>
+          <h2 style="font-size:1.4rem;font-weight:800;" id="done-title" data-t="s4Title">اكتمل تثبيت Claude Switch Pro بنجاح!</h2>
+          <p style="font-size:0.86rem;color:var(--text-sec);line-height:1.6;" id="done-desc" data-t="s4Sub">
+            تم تثبيت التطبيق الموحد ومزامنة الإعدادات بنجاح. يمكنك الآن تشغيل لوحة التحكم الفورية فوراً.
+          </p>
+          <div class="pill mono" id="done-path" style="max-width:100%;overflow:hidden;text-overflow:ellipsis;">—</div>
+          <div style="display:flex;gap:10px;margin-top:8px;">
+            <button type="button" class="btn-primary" id="btn-launch-app" data-t="btnLaunch">تشغيل Claude Switch Pro الآن</button>
+            <button type="button" class="btn-ghost" id="btn-finish-only" data-t="btnFinish">إغلاق</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const I18N = {
+      ar: {
+        brandTitle: "معالج تثبيت Claude Switch Pro",
+        modeFresh: "تثبيت متكامل",
+        modeUpgrade: "ترقية ذكية للإصدار المثبت",
+        btnTheme: "داكن",
+        btnThemeLight: "فاتح",
+        st1: "الترحيب",
+        st2: "المسار والخيارات",
+        st3: "مراحل التثبيت",
+        st4: "الاكتمال والتشغيل",
+        heroTitle: "مركز تحكم وجسر نماذج AI الأصلي",
+        heroSub: "تطبيق سطح مكتب مدمج فوري الإقلاع مع جسر Rust مدمج عالي الأداء ومزامنة تلقائية لـ Claude Code CLI و DeepSeek Harness وتحديثات تلقائية من GitHub.",
+        f1Title: "إقلاع فوري بدون شاشة رمادية",
+        f1Desc: "نواة WebView2 مدمجة دون الاعتماد على متصفح خارجي أو Node.js",
+        f2Title: "محرك Responses + درع الحماية",
+        f2Desc: "دعم Vision و PDF وتفكير xhigh وحماية استباقية ضد 429",
+        f3Title: "مزامنة بنقرة واحدة",
+        f3Desc: "تهيئة فورية لـ Claude Code و DeepSeek Harness و Desktop",
+        f4Title: "تحديثات GitHub التلقائية",
+        f4Desc: "تنزيل وتثبيت الإصدارات الجديدة موقّعة رقمياً بضغطة واحدة",
+        licenseTag: "مفتوح المصدر — MIT License",
+        btnCancel: "إلغاء",
+        btnStart: "بدء الإعداد",
+        s2Title: "اختر مسار التثبيت والخيارات المتكاملة",
+        s2Sub: "سيتم نقل إعدادات .env وإحصائياتك السابقة تلقائياً دون أي فقد.",
+        lblInstallDir: "مجلد التثبيت",
+        btnBrowse: "استعراض...",
+        optDesktop: "اختصار سطح المكتب",
+        optDesktopDesc: "إضافة أيقونة Aura على سطح المكتب",
+        optStartMenu: "اختصار قائمة ابدأ",
+        optStartMenuDesc: "تثبيت التطبيق في قائمة ابدأ وإلغاء التثبيت",
+        optAutoStart: "التشغيل مع بدء النظام",
+        optAutoStartDesc: "إبقاء الجسر جاهزاً في شريط المهام عند تسجيل الدخول",
+        optSyncApps: "مزامنة الأدوات تلقائياً",
+        optSyncAppsDesc: "تحديث Claude Code و DeepSeek Harness فور التثبيت",
+        btnBack: "السابق",
+        btnInstallNow: "تثبيت الآن",
+        s3Title: "جاري تثبيت المكونات وتهيئة النظام...",
+        s3Sub: "يرجى الانتظار بضع ثوانٍ",
+        tStop: "إيقاف أي عملية سابقة وتحضير المسار",
+        tExtract: "نسخ التطبيق الموحد والأيقونات",
+        tMigrate: "ترحيل الإعدادات والبيانات السابقة",
+        tShortcuts: "تسجيل النظام وإنشاء الاختصارات",
+        tSync: "التشغيل التلقائي ومزامنة التطبيقات",
+        tVerify: "التحقق من السلامة والجاهزية",
+        s4Title: "اكتمل تثبيت Claude Switch Pro بنجاح!",
+        s4Sub: "تم تثبيت التطبيق الموحد ومزامنة الإعدادات بنجاح. يمكنك الآن تشغيل لوحة التحكم الفورية فوراً.",
+        btnLaunch: "تشغيل Claude Switch Pro الآن",
+        btnFinish: "إغلاق",
+      },
+      en: {
+        brandTitle: "Claude Switch Pro Setup Wizard",
+        modeFresh: "Full Installation",
+        modeUpgrade: "Smart Upgrade",
+        btnTheme: "Dark",
+        btnThemeLight: "Light",
+        st1: "Welcome",
+        st2: "Path & Options",
+        st3: "Installing",
+        st4: "Complete",
+        heroTitle: "Unified Native AI Bridge & Control Hub",
+        heroSub: "Instant WebView2 desktop app with embedded Rust Responses API engine, automatic sync for Claude Code & DeepSeek Harness, and signed GitHub auto-updates.",
+        f1Title: "Instant Native Startup",
+        f1Desc: "Zero grey screen, zero Node.js dependency, built-in WebView2 shell",
+        f2Title: "Responses Engine + Shield",
+        f2Desc: "Full Vision, PDF, xhigh reasoning, and pre-commit SSE rate-limit shield",
+        f3Title: "1-Click Tool Sync",
+        f3Desc: "Automatically configures Claude Code CLI, DeepSeek Harness & Desktop",
+        f4Title: "GitHub Auto-Updater",
+        f4Desc: "Signed cross-platform updates directly from GitHub Releases",
+        licenseTag: "Open Source — MIT License",
+        btnCancel: "Cancel",
+        btnStart: "Get Started",
+        s2Title: "Installation Folder & Preferences",
+        s2Sub: "Existing .env keys and telemetry history are preserved automatically.",
+        lblInstallDir: "Install Directory",
+        btnBrowse: "Browse...",
+        optDesktop: "Desktop Shortcut",
+        optDesktopDesc: "Create Claude Switch Pro icon on Desktop",
+        optStartMenu: "Start Menu & Registry",
+        optStartMenuDesc: "Register Start Menu shortcut & Add/Remove Programs entry",
+        optAutoStart: "Launch at Startup",
+        optAutoStartDesc: "Keep the bridge ready in system tray on login",
+        optSyncApps: "Auto-Sync AI Tools",
+        optSyncAppsDesc: "Sync Claude Code CLI & DeepSeek Harness after install",
+        btnBack: "Back",
+        btnInstallNow: "Install Now",
+        s3Title: "Installing Components & Configuring Bridge...",
+        s3Sub: "This will finish in a few seconds",
+        tStop: "Stopping running instances & preparing target",
+        tExtract: "Deploying unified app & desktop icons",
+        tMigrate: "Migrating .env & telemetry state",
+        tShortcuts: "Registering shortcuts & uninstaller",
+        tSync: "Configuring startup & syncing tools",
+        tVerify: "Verifying installation integrity",
+        s4Title: "Claude Switch Pro Installed Successfully!",
+        s4Sub: "Your unified desktop app and local bridge engine are ready. Launch the control center anytime from Start Menu or Tray.",
+        btnLaunch: "Launch Claude Switch Pro Now",
+        btnFinish: "Close",
+      }
+    };
+
+    let lang = "ar";
+    let theme = "light";
+    let isUpgrade = false;
+
+    function sendIpc(payload) {
+      try {
+        window.ipc.postMessage(JSON.stringify(payload));
+      } catch (e) {}
+    }
+
+    function applyLang(nextLang) {
+      lang = nextLang === "en" ? "en" : "ar";
+      document.documentElement.setAttribute("lang", lang);
+      document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
+      document.getElementById("btn-wiz-lang").textContent = lang === "ar" ? "English" : "العربية";
+      const dict = I18N[lang];
+      document.querySelectorAll("[data-t]").forEach((el) => {
+        const key = el.getAttribute("data-t");
+        if (dict[key]) el.textContent = dict[key];
+      });
+      document.getElementById("wiz-mode-pill").textContent = isUpgrade ? dict.modeUpgrade : dict.modeFresh;
+      document.getElementById("btn-wiz-theme").textContent = theme === "dark" ? dict.btnThemeLight : dict.btnTheme;
+    }
+
+    function applyTheme(nextTheme) {
+      theme = nextTheme === "dark" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", theme);
+      const dict = I18N[lang];
+      document.getElementById("btn-wiz-theme").textContent = theme === "dark" ? dict.btnThemeLight : dict.btnTheme;
+    }
+
+    function goStep(stepNum) {
+      document.querySelectorAll(".pane").forEach((p, idx) => p.classList.toggle("active", idx + 1 === stepNum));
+      document.querySelectorAll(".step-chip").forEach((c) => {
+        const s = Number(c.getAttribute("data-step"));
+        c.classList.toggle("active", s === stepNum);
+        c.classList.toggle("completed", s < stepNum);
+      });
+    }
+
+    window.__INSTALLER_INIT__ = (info) => {
+      if (info.version) document.getElementById("wiz-ver").textContent = `v${info.version}`;
+      if (info.arch) document.getElementById("wiz-arch").textContent = info.arch;
+      if (info.defaultPath) document.getElementById("install-dir").value = info.defaultPath;
+      if (typeof info.existingInstalled === "boolean") {
+        isUpgrade = info.existingInstalled;
+        applyLang(lang);
+      }
+    };
+
+    window.__INSTALLER_PATH__ = (path) => {
+      if (path) document.getElementById("install-dir").value = path;
+    };
+
+    window.__INSTALLER_STEP__ = ({ stepId, status, progress, logLine }) => {
+      if (typeof progress === "number") {
+        document.getElementById("prog-bar").style.width = `${Math.min(100, Math.max(0, progress))}%`;
+        document.getElementById("prog-pct").textContent = `${Math.min(100, Math.max(0, progress))}%`;
+      }
+      if (stepId) {
+        const row = document.getElementById(`task-${stepId}`);
+        if (row) {
+          row.classList.remove("running", "done", "error");
+          if (status) row.classList.add(status);
+          const dot = row.querySelector(".task-dot");
+          if (dot && status === "done") dot.textContent = "✓";
+          if (dot && status === "error") dot.textContent = "!";
+        }
+      }
+      if (logLine) {
+        const box = document.getElementById("install-log");
+        const div = document.createElement("div");
+        div.textContent = logLine;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+      }
+    };
+
+    window.__INSTALLER_DONE__ = ({ ok, installedPath, error }) => {
+      const donePath = document.getElementById("done-path");
+      if (donePath) donePath.textContent = installedPath || "";
+      if (!ok) {
+        document.getElementById("done-icon").textContent = "!";
+        document.getElementById("done-icon").style.borderColor = "var(--err)";
+        document.getElementById("done-icon").style.color = "var(--err)";
+        document.getElementById("done-title").textContent = lang === "ar" ? "تعذر إكمال التثبيت" : "Installation Failed";
+        document.getElementById("done-desc").textContent = error || "Unknown error";
+        document.getElementById("btn-launch-app").style.display = "none";
+      }
+      goStep(4);
+    };
+
+    document.getElementById("btn-wiz-lang").addEventListener("click", () => applyLang(lang === "ar" ? "en" : "ar"));
+    document.getElementById("btn-wiz-theme").addEventListener("click", () => applyTheme(theme === "dark" ? "light" : "dark"));
+    document.getElementById("btn-cancel-1").addEventListener("click", () => sendIpc({ cmd: "close" }));
+    document.getElementById("btn-next-1").addEventListener("click", () => goStep(2));
+    document.getElementById("btn-back-2").addEventListener("click", () => goStep(1));
+    document.getElementById("btn-browse").addEventListener("click", () => sendIpc({
+      cmd: "browse_folder",
+      currentPath: document.getElementById("install-dir").value
+    }));
+    document.getElementById("btn-install-now").addEventListener("click", () => {
+      goStep(3);
+      document.getElementById("install-log").innerHTML = "";
+      sendIpc({
+        cmd: "start_install",
+        installDir: document.getElementById("install-dir").value.trim(),
+        desktopShortcut: document.getElementById("chk-desktop").checked,
+        startMenuShortcut: document.getElementById("chk-startmenu").checked,
+        autoStart: document.getElementById("chk-autostart").checked,
+        autoSync: document.getElementById("chk-sync").checked,
+      });
+    });
+    document.getElementById("btn-launch-app").addEventListener("click", () => sendIpc({
+      cmd: "launch_and_close",
+      installDir: document.getElementById("install-dir").value.trim()
+    }));
+    document.getElementById("btn-finish-only").addEventListener("click", () => sendIpc({ cmd: "close" }));
+
+    applyLang("ar");
+    sendIpc({ cmd: "ready" });
+  </script>
+</body>
+</html>
+

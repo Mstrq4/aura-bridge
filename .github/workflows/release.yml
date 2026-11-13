@@ -1,0 +1,105 @@
+name: Release Cross-Platform Multi-Arch
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-tauri:
+    name: Build & Sign (${{ matrix.platform }} / ${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            target: x86_64-pc-windows-msvc
+            arch_label: windows-x86_64
+            is_windows: true
+            mac_targets: ""
+          - platform: windows-latest
+            target: aarch64-pc-windows-msvc
+            arch_label: windows-arm64
+            is_windows: true
+            mac_targets: ""
+          - platform: macos-latest
+            target: aarch64-apple-darwin
+            arch_label: macos-aarch64
+            is_windows: false
+            mac_targets: ""
+          - platform: macos-latest
+            target: x86_64-apple-darwin
+            arch_label: macos-x86_64
+            is_windows: false
+            mac_targets: ""
+          - platform: macos-latest
+            target: universal-apple-darwin
+            arch_label: macos-universal
+            is_windows: false
+            mac_targets: "x86_64-apple-darwin aarch64-apple-darwin"
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install Tauri CLI
+        run: npm ci
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.mac_targets != '' && matrix.mac_targets || matrix.target }}
+
+      - name: Cache Rust artifacts
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build Tauri Bundles & Updater Artifacts
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: "Claude Switch Pro ${{ github.ref_name }}"
+          releaseBody: |
+            ### Claude Switch Pro ${{ github.ref_name }}
+            - Unified Tauri v2 + Embedded Rust Bridge Engine (Instant Native Launch, Zero Node.js)
+            - Aura Glassmorphic Multi-Step Windows Setup Wizard (`ClaudeSwitchPro-Setup-*.exe`) & macOS Apple Silicon / Intel / Universal `.dmg`
+            - Signed Auto-Updater (`latest.json`) across Windows & macOS
+          releaseDraft: false
+          prerelease: false
+          args: --target ${{ matrix.target }}
+
+      - name: Build Custom Aura Multi-Step Setup Wizard (Windows)
+        if: ${{ matrix.is_windows }}
+        shell: pwsh
+        run: |
+          $bin = "target/${{ matrix.target }}/release/claude-switch-pro.exe"
+          if (-not (Test-Path $bin)) { $bin = "target/release/claude-switch-pro.exe" }
+          $env:CSP_PAYLOAD_PATH = (Resolve-Path $bin).Path
+          cargo build --release -p claude-switch-pro-setup --target ${{ matrix.target }}
+          New-Item -ItemType Directory -Force -Path dist-setup | Out-Null
+          $wizOut = "target/${{ matrix.target }}/release/ClaudeSwitchPro-Setup.exe"
+          Copy-Item $wizOut "dist-setup/ClaudeSwitchPro-Setup-${{ matrix.arch_label }}.exe" -Force
+
+      - name: Upload Aura Setup Wizard to Release (Windows)
+        if: ${{ matrix.is_windows && startsWith(github.ref, 'refs/tags/v') }}
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: dist-setup/ClaudeSwitchPro-Setup-${{ matrix.arch_label }}.exe
+
