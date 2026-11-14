@@ -45,7 +45,7 @@ pub fn classify_upstream_failure(
         Regex::new(r"(?i)(too_many_requests|rate[\s_-]?limit|exceeded.*rate limit|quota.*exceeded|tokens per minute|requests per minute|Responses upstream too_many_requests)").unwrap()
     });
     let re_transient = RE_TRANSIENT.get_or_init(|| {
-        Regex::new(r"(?i)(overloaded|server_error|bad gateway|service unavailable|gateway timeout|timed?\s*out|ECONNRESET|ETIMEDOUT|socket hang up|fetch failed|upstream.*error)").unwrap()
+        Regex::new(r"(?i)(overloaded|server_error|bad gateway|service unavailable|gateway timeout|timed?\s*out|ECONNRESET|ETIMEDOUT|socket hang up|fetch failed|upstream.*error|error decoding response body|unexpected eof|connection closed|broken pipe|reset by peer|incomplete message|stream error)").unwrap()
     });
 
     let code_l = err_code.unwrap_or("").to_ascii_lowercase();
@@ -293,10 +293,56 @@ pub struct UpstreamClient {
     gate: HeavyRequestGate,
 }
 
+fn decode_utf8_chunk(pending: &mut Vec<u8>, chunk: &[u8]) -> String {
+    pending.extend_from_slice(chunk);
+    let mut out = String::new();
+    let mut idx = 0usize;
+    while idx < pending.len() {
+        match std::str::from_utf8(&pending[idx..]) {
+            Ok(valid) => {
+                out.push_str(valid);
+                idx = pending.len();
+            }
+            Err(err) => {
+                let valid_up_to = err.valid_up_to();
+                if valid_up_to > 0 {
+                    out.push_str(
+                        std::str::from_utf8(&pending[idx..idx + valid_up_to]).unwrap_or_default(),
+                    );
+                    idx += valid_up_to;
+                }
+                match err.error_len() {
+                    Some(bad_len) => {
+                        out.push('\u{FFFD}');
+                        idx += bad_len;
+                    }
+                    None => break, // Incomplete trailing multi-byte UTF-8 sequence; wait for next chunk
+                }
+            }
+        }
+    }
+    if idx > 0 {
+        pending.drain(..idx);
+    }
+    out
+}
+
+fn flush_utf8_pending(pending: &mut Vec<u8>) -> String {
+    if pending.is_empty() {
+        return String::new();
+    }
+    let text = String::from_utf8_lossy(pending).into_owned();
+    pending.clear();
+    text
+}
+
 impl UpstreamClient {
     pub fn new() -> Self {
         let http = Client::builder()
-            .pool_idle_timeout(Duration::from_secs(60))
+            .connect_timeout(Duration::from_secs(20))
+            .tcp_keepalive(Some(Duration::from_secs(15)))
+            // Disable stale HTTP keep-alive socket reuse so long SSE/WAF edges never fail on half-closed sockets
+            .pool_max_idle_per_host(0)
             .build()
             .expect("reqwest client build failed");
         Self {
@@ -333,6 +379,7 @@ impl UpstreamClient {
                 .timeout(Duration::from_millis(config.upstream_timeout_ms))
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
+                .header("Accept-Encoding", "identity")
                 .header("User-Agent", &config.upstream_user_agent);
             if !api_key.is_empty() {
                 builder = builder.header("Authorization", format!("Bearer {api_key}"));
@@ -342,7 +389,29 @@ impl UpstreamClient {
                 Ok(resp) => {
                     let status = resp.status().as_u16();
                     let hdrs = resp.headers().clone();
-                    let text = resp.text().await.unwrap_or_default();
+                    let text = match resp.text().await {
+                        Ok(t) => t,
+                        Err(e) => {
+                            let msg = e.to_string();
+                            let cls = classify_upstream_failure(None, &msg, None);
+                            let err = UpstreamBridgeError {
+                                message: format!("Response decode error: {}", redact_secrets(&msg)),
+                                status: 502,
+                                is_rate_limit: cls.is_rate_limit,
+                                retry_after: None,
+                                upstream_status: Some(status),
+                                code: None,
+                            };
+                            if !cls.is_retryable || attempt == max_attempts {
+                                return Err(err);
+                            }
+                            on_retry(cls.is_rate_limit);
+                            let delay = compute_backoff_delay_ms(attempt, config, None);
+                            last_err = Some(err);
+                            tokio::time::sleep(Duration::from_millis(delay)).await;
+                            continue;
+                        }
+                    };
                     if (200..300).contains(&status) {
                         return serde_json::from_str::<Value>(&text).map_err(|e| {
                             UpstreamBridgeError {
@@ -433,21 +502,44 @@ impl UpstreamClient {
 
         let mut last_err: Option<UpstreamBridgeError> = None;
 
+        let chunk_timeout = Duration::from_millis(config.upstream_timeout_ms.max(15_000));
+
         for attempt in 1..=max_attempts {
             let mut builder = self
                 .http
                 .post(&url)
-                .timeout(Duration::from_millis(config.upstream_timeout_ms))
                 .header("Content-Type", "application/json")
                 .header("Accept", "text/event-stream")
+                .header("Accept-Encoding", "identity")
+                .header("Connection", "close")
                 .header("User-Agent", &config.upstream_user_agent);
             if !api_key.is_empty() {
                 builder = builder.header("Authorization", format!("Bearer {api_key}"));
             }
 
             let mut committed = false;
-            match builder.json(&req_payload).send().await {
-                Ok(resp) => {
+            let send_fut = tokio::time::timeout(chunk_timeout, builder.json(&req_payload).send());
+            match send_fut.await {
+                Err(_) => {
+                    let err = UpstreamBridgeError {
+                        message: "Upstream stream connect timed out".to_string(),
+                        status: 504,
+                        is_rate_limit: false,
+                        retry_after: None,
+                        upstream_status: None,
+                        code: None,
+                    };
+                    if attempt == max_attempts {
+                        let _ = tx.send(StreamCallbackEvent::Error(err)).await;
+                        return;
+                    }
+                    on_retry(false);
+                    let delay = compute_backoff_delay_ms(attempt, config, None);
+                    last_err = Some(err);
+                    tokio::time::sleep(Duration::from_millis(delay)).await;
+                    continue;
+                }
+                Ok(Ok(resp)) => {
                     let status = resp.status().as_u16();
                     let hdrs = resp.headers().clone();
                     if !(200..300).contains(&status) {
@@ -480,18 +572,60 @@ impl UpstreamClient {
                     }
 
                     let mut parser = SseFrameParser::default();
+                    let mut utf8_pending: Vec<u8> = Vec::new();
                     let mut primed: Vec<SseFrame> = Vec::new();
                     let mut pre_commit_failure: Option<UpstreamBridgeError> = None;
+                    let mut terminal_event_seen = false;
                     let mut byte_stream = resp.bytes_stream();
 
-                    while let Some(chunk_res) = byte_stream.next().await {
+                    loop {
+                        let next_item = tokio::time::timeout(chunk_timeout, byte_stream.next()).await;
+                        let Some(chunk_res) = (match next_item {
+                            Ok(item) => item,
+                            Err(_) => {
+                                if terminal_event_seen {
+                                    break;
+                                }
+                                let err = UpstreamBridgeError {
+                                    message: "Stream read error: chunk timed out".to_string(),
+                                    status: 504,
+                                    is_rate_limit: false,
+                                    retry_after: None,
+                                    upstream_status: None,
+                                    code: None,
+                                };
+                                if committed {
+                                    let _ = tx.send(StreamCallbackEvent::Error(err)).await;
+                                    return;
+                                }
+                                pre_commit_failure = Some(err);
+                                break;
+                            }
+                        }) else {
+                            break;
+                        };
                         match chunk_res {
                             Ok(bytes) => {
-                                let text = String::from_utf8_lossy(&bytes);
+                                let text = decode_utf8_chunk(&mut utf8_pending, &bytes);
                                 for frame in parser.push(&text) {
                                     if pre_commit_failure.is_some() {
                                         continue;
                                     }
+                                    if frame.done {
+                                        terminal_event_seen = true;
+                                    } else if let Some(ref dobj) = frame.data_obj {
+                                        let typ = dobj.get("type").and_then(Value::as_str).unwrap_or("");
+                                        if matches!(
+                                            typ,
+                                            "response.completed"
+                                                | "response.incomplete"
+                                                | "response.failed"
+                                                | "message_stop"
+                                        ) {
+                                            terminal_event_seen = true;
+                                        }
+                                    }
+
                                     if !committed {
                                         if frame.done {
                                             committed = true;
@@ -548,6 +682,10 @@ impl UpstreamClient {
                                 }
                             }
                             Err(e) => {
+                                // Ignore benign socket teardown EOF/decode glitches once terminal completion frame arrived
+                                if terminal_event_seen {
+                                    break;
+                                }
                                 let msg = e.to_string();
                                 let cls = classify_upstream_failure(None, &msg, None);
                                 let err = UpstreamBridgeError {
@@ -569,6 +707,19 @@ impl UpstreamClient {
                     }
 
                     if pre_commit_failure.is_none() {
+                        let tail = flush_utf8_pending(&mut utf8_pending);
+                        if !tail.is_empty() {
+                            for frame in parser.push(&tail) {
+                                if !committed {
+                                    committed = true;
+                                    let _ = tx.send(StreamCallbackEvent::Commit).await;
+                                    for pf in primed.drain(..) {
+                                        let _ = tx.send(StreamCallbackEvent::Frame(pf)).await;
+                                    }
+                                }
+                                let _ = tx.send(StreamCallbackEvent::Frame(frame)).await;
+                            }
+                        }
                         for frame in parser.flush() {
                             if !committed {
                                 committed = true;
@@ -606,7 +757,7 @@ impl UpstreamClient {
                     }
                     return;
                 }
-                Err(e) => {
+                Ok(Err(e)) => {
                     let msg = e.to_string();
                     let cls = classify_upstream_failure(None, &msg, None);
                     let err = UpstreamBridgeError {
@@ -818,5 +969,30 @@ mod tests {
         assert!(saw_recovered);
 
         server_task.abort();
+    }
+
+    #[test]
+    fn classifies_stream_decode_error_as_retryable() {
+        let cls = classify_upstream_failure(
+            Some(502),
+            "Stream read error: error decoding response body",
+            None,
+        );
+        assert!(cls.is_retryable);
+        assert!(!cls.is_rate_limit);
+    }
+
+    #[test]
+    fn decodes_split_multibyte_utf8_chunks_without_replacement() {
+        let arabic = "مرحبا بالعالم 🚀";
+        let raw = arabic.as_bytes();
+        // Split right inside multi-byte Arabic and emoji sequences
+        let mut pending = Vec::new();
+        let mut reconstructed = String::new();
+        reconstructed.push_str(&decode_utf8_chunk(&mut pending, &raw[..3]));
+        reconstructed.push_str(&decode_utf8_chunk(&mut pending, &raw[3..raw.len() - 2]));
+        reconstructed.push_str(&decode_utf8_chunk(&mut pending, &raw[raw.len() - 2..]));
+        reconstructed.push_str(&flush_utf8_pending(&mut pending));
+        assert_eq!(reconstructed, arabic);
     }
 }
